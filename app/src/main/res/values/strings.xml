@@ -1,0 +1,103 @@
+<resources>
+    <string name="app_name">MapLocalizeAndMove</string>
+
+    <!-- Autonomous abilities -->
+    <string name="hold">Hold</string>
+    <string name="release">Release</string>
+
+    <!-- LookAt -->
+    <string name="cancel_action">Cancel action</string>
+
+    <!-- People characteristics -->
+    <string name="refresh">Refresh</string>
+    <string name="gender">Gender: %1$s</string>
+    <string name="pleasure_state">Pleasure state: %1$s</string>
+    <string name="excitement_state">Excitement state: %1$s</string>
+    <string name="engagement_intention_state">Engagement intention state: %1$s</string>
+    <string name="smile_state">Smile state: %1$s</string>
+    <string name="attention_state">Attention state: %1$s</string>
+    <string name="distance">Distance: %1$f meter(s)</string>
+
+    <!-- Dynamic concepts -->
+    <string name="greeting">Greeting</string>
+
+    <!-- Go to world -->
+    <string name="save">Save Attached Frame</string>
+    <string name="go_to_text">Go to Frame</string>
+    <string name="location">Location</string>
+    <string name="start_map">Start LocalizeAndMap</string>
+    <string name="stop_map">Stop LocalizeAndMap</string>
+    <string name="start_localize_robot">Start Localize Robot</string>
+    <string name="stop_localize_robot">Stop Localize Robot</string>
+    <string name="gotomapframe">Go to MapFrame</string>
+    <string name="load_locations">Load Locations</string>
+    <string name="save_locations">Backup Locations</string>
+    <string name="goto_setup">Go to Setup page</string>
+    <string name="goto_production">Go to Production Page</string>
+
+
+    <!-- Follow human -->
+    <string name="follow">Follow</string>
+    <string name="stop">Stop</string>
+
+    <!-- QiChat variables -->
+    <string name="value">Value</string>
+    <string name="template">My robot is ______</string>
+
+    <!-- Chat locale -->
+    <string name="english">EN</string>
+    <string name="japanese">JA</string>
+
+    <!-- Tutorial names -->
+    <string name="hello_human">Hello human</string>
+    <string name="qichatbot">Listen and reply</string>
+    <string name="listen">Catch few words</string>
+    <string name="bookmarks">Mastering Bookmark</string>
+    <string name="execute">Mastering Execute</string>
+    <string name="dynamic_concepts">Mastering Dynamic concept</string>
+    <string name="qichat_variables">Mastering QiChat variable</string>
+    <string name="animation">Mimic animals</string>
+    <string name="go_to">Understanding GoTo</string>
+    <string name="look_at">Understanding LookAt</string>
+    <string name="go_to_world">Mastering FreeFrames</string>
+    <string name="follow_human">Mastering AttachedFrame</string>
+    <string name="autonomous_abilities">Hold/release autonomous abilities</string>
+    <string name="people_characteristics">Mastering HumanAwareness &amp; Human</string>
+    <string name="touch">React when touched</string>
+    <string name="trajectory">Step forward</string>
+    <string name="emotion">Mastering Emotion detection</string>
+    <string name="animation_label">Mastering Animation labels</string>
+    <string name="take_picture">Take a picture</string>
+    <string name="enforce_tablet_reachability">Enforce tablet reachability</string>
+    <string name="detect_humans_with_localization">Detect humans with localization</string>
+    <string name="chat_locale">Mastering Chat locale</string>
+
+    <!-- Categories -->
+    <string name="categories_intro_sentence">Please tell me or select on the tablet which demo you want me to show you</string>
+    <string name="categories_intro_sentence_variant">And now?</string>
+    <string name="let_s_talk">\"Let\'s talk\"</string>
+    <string name="let_s_move">\"Let\'s move\"</string>
+    <string name="let_s_be_smart">\"Let\'s be smart\"</string>
+
+    <!-- Toolbar -->
+    <string name="toolbar_basic_level">Basic &lt;/&gt;</string>
+    <string name="toolbar_advanced_level">Advanced &lt;//&gt;</string>
+
+    <!-- Tutorial levels -->
+    <string name="basic_level">&lt;/&gt;</string>
+    <string name="advanced_level">&lt;//&gt;</string>
+
+    <!-- Content descriptions -->
+    <string name="content_description_close_button">Close button</string>
+    <string name="content_description_add_button">Add button</string>
+    <string name="content_description_emotion_view">Emotion view</string>
+    <string name="content_description_assign_button">Assign button</string>
+    <string name="content_description_sbr_logo">SoftBank Robotics logo</string>
+    <string name="content_description_picture_view">Picture view</string>
+    <string name="content_description_delete_button">Delete button</string>
+    <string name="content_description_face_image">Face image</string>
+    <string name="content_description_human_icon">Human icon</string>
+    <string name="content_description_robot_icon">Robot icon</string>
+    <string name="content_description_back_button">Back button</string>
+
+</resources>

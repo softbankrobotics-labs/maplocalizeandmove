@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: com.aldebaran:qisdk:1.4.8@aar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/qisdk-1.4.8.aar/6a0aef1a02243a447368b43f374c57fb/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/qisdk-1.4.8.aar/6a0aef1a02243a447368b43f374c57fb/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.aldebaran/qisdk/1.4.8/2c23185d137114c67fe51e87d537cf680175e8c5/qisdk-1.4.8-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
