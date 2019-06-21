@@ -180,12 +180,18 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
         saveAttachedFrameButton = findViewById(R.id.save_button);
         saveAttachedFrameButton.setOnClickListener(v -> {
             String location = editText.getText().toString();
-            editText.setText("");
-            // Save location only if new.
-            if (!location.isEmpty() && !savedLocations.containsKey(location)) {
-                runOnUiThread(() -> spinnerAdapter.add(location));
-                saveLocation(location);
+            if (location.isEmpty()) {
+                displayMessage("Please enter location name");
+                return;
             }
+            if (savedLocations.containsKey(location)) {
+                displayMessage("Location name already exists,please enter again!");
+                return;
+            }
+            editText.setText("");
+            // Save location
+            runOnUiThread(() -> spinnerAdapter.add(location));
+            saveLocation(location);
         });
 
 
@@ -278,8 +284,13 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
 
     private void saveLocation(final String location) {
         // Get the robot frame asynchronously.
+        Log.d(TAG, "start saveLocation");
         robotHelper.createAttachedFrameFromCurrentPosition()
-                .andThenConsume(attachedFrame -> savedLocations.put(location, attachedFrame));
+                .andThenConsume(attachedFrame -> {
+                            savedLocations.put(location, attachedFrame);
+                            Log.d(TAG, "savedLocations.put:" + location);
+                        }
+                );
     }
 
     private void loadLocations() {
@@ -287,7 +298,8 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
         executor.execute(() -> {
 
             // Read file into a temporary hashmap
-            File file = new File(getFilesDir(), "hashmap.ser");
+            //File file = new File(getFilesDir(), "hashmap.ser");
+            File file = new File(getExternalFilesDir("Locations"), "hashmap.ser");
             if (file.exists()) {
                 displayMessage("Loading locations from memory... ");
 
@@ -301,7 +313,7 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
                 for (Map.Entry<String, Vector2> entry : vectors.entrySet()) {
                     // Create a transform from the vector2
                     Transform t = entry.getValue().createTransform();
-                    Log.d(TAG, "loadLocations: " + entry.getKey());
+                    Log.d(TAG, "loadLocations traversal key: " + entry.getKey());
 
                     // Create an AttachedFrame representing the current robot frame relatively to the MapFrame
                     AttachedFrame attachedFrame = mapFrame.async().makeAttachedFrame(t).getValue();
@@ -313,10 +325,11 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
                 Log.d(TAG, "loadLocations: Done");
                 runOnUiThread(() -> {
                     checkbox_locations_loaded.setBackgroundResource(R.drawable.checked);
-                    spinnerAdapter.add("mapFrame");
+                    //spinnerAdapter.add("mapFrame");
                 });
 
             } else displayMessage("No locations in memory to load. ");
+
         });
     }
 

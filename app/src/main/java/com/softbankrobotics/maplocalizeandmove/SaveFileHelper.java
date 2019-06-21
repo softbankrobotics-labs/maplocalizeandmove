@@ -26,10 +26,10 @@ public class SaveFileHelper {
         FileInputStream fis = null;
         ObjectInputStream ois = null;
         try {
-            fis = new FileInputStream(new File(applicationContext.getFilesDir(), "hashmap.ser"));
+            //fis = new FileInputStream(new File(applicationContext.getFilesDir(), "hashmap.ser"));
+            fis = new FileInputStream(new File(applicationContext.getExternalFilesDir("Locations"), "hashmap.ser"));
             ois = new ObjectInputStream(fis);
             vectors = (HashMap) ois.readObject();
-
         } catch (FileNotFoundException e) {
             Log.e(TAG, e.getMessage(), e);
         } catch (IOException e) {
@@ -58,7 +58,8 @@ public class SaveFileHelper {
 
         // Backup list into a file
         try {
-            fos = new FileOutputStream(new File(applicationContext.getFilesDir(), "hashmap.ser"));
+            //fos = new FileOutputStream(new File(applicationContext.getFilesDir(), "hashmap.ser"));
+            fos = new FileOutputStream(new File(applicationContext.getExternalFilesDir("Locations"), "hashmap.ser"));
             oos = new ObjectOutputStream(fos);
             oos.writeObject(locationsToBackup);
             Log.d(TAG, "backupLocations: Done");
