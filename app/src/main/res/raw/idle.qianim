@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Animation xmlns:editor="http://www.ald.softbankrobotics.com/animation/editor" typeVersion="2.0" editor:fps="25">
+    <ActuatorCurve fps="25" actuator="HeadYaw" mute="false" unit="degree">
+        <Key value="-0.439454377" frame="80"/>
+    </ActuatorCurve>
+    <ActuatorCurve fps="25" actuator="HeadPitch" mute="false" unit="degree">
+        <Key value="-12.1289139" frame="80"/>
+    </ActuatorCurve>
+    <ActuatorCurve fps="25" actuator="LShoulderPitch" mute="false" unit="degree">
+        <Key value="90.5273514" frame="80"/>
+    </ActuatorCurve>
+    <ActuatorCurve fps="25" actuator="LShoulderRoll" mute="false" unit="degree">
+        <Key value="6.67969275" frame="80"/>
+    </ActuatorCurve>
+    <ActuatorCurve fps="25" actuator="LElbowYaw" mute="false" unit="degree">
+        <Key value="-69.7851486" frame="80"/>
+    </ActuatorCurve>
+    <ActuatorCurve fps="25" actuator="LElbowRoll" mute="false" unit="degree">
+        <Key value="-29.7070332" frame="80"/>
+    </ActuatorCurve>
+    <ActuatorCurve fps="25" actuator="LWristYaw" mute="false" unit="degree">
+        <Key value="-1.76023543" frame="80"/>
+    </ActuatorCurve>
+    <ActuatorCurve fps="25" actuator="LHand" mute="false" unit="dimensionless">
+        <Key value="0.589630966" frame="80"/>
+    </ActuatorCurve>
+    <ActuatorCurve fps="25" actuator="HipRoll" mute="false" unit="degree">
+        <Key value="-0.26367262" frame="80"/>
+    </ActuatorCurve>
+    <ActuatorCurve fps="25" actuator="HipPitch" mute="false" unit="degree">
+        <Key value="-1.49414492" frame="80"/>
+    </ActuatorCurve>
+    <ActuatorCurve fps="25" actuator="KneePitch" mute="false" unit="degree">
+        <Key value="0" frame="80"/>
+    </ActuatorCurve>
+    <ActuatorCurve fps="25" actuator="RShoulderPitch" mute="false" unit="degree">
+        <Key value="90.5273438" frame="80"/>
+    </ActuatorCurve>
+    <ActuatorCurve fps="25" actuator="RShoulderRoll" mute="false" unit="degree">
+        <Key value="-6.59180212" frame="80"/>
+    </ActuatorCurve>
+    <ActuatorCurve fps="25" actuator="RElbowYaw" mute="false" unit="degree">
+        <Key value="70.2246094" frame="80"/>
+    </ActuatorCurve>
+    <ActuatorCurve fps="25" actuator="RElbowRoll" mute="false" unit="degree">
+        <Key value="29.7070332" frame="80"/>
+    </ActuatorCurve>
+    <ActuatorCurve fps="25" actuator="RWristYaw" mute="false" unit="degree">
+        <Key value="1.57964516" frame="80"/>
+    </ActuatorCurve>
+    <ActuatorCurve fps="25" actuator="RHand" mute="false" unit="dimensionless">
+        <Key value="0.588752136" frame="80"/>
+    </ActuatorCurve>
+</Animation>

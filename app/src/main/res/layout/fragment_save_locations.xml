@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="fill_parent">
+
+    <TextView
+        android:id="@+id/two_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:gravity="center"
+        android:text="@string/SaveLocationFragment"
+        android:textColor="@color/black"
+        android:textSize="40sp"
+        android:fontFamily="@font/verdanab"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/back_button"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/ic_btn_back"
+        android:gravity="fill"
+        android:includeFontPadding="false"
+        android:textAlignment="center"
+        android:textAllCaps="false"
+        android:textSize="60sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/button_add_location"
+        android:layout_width="405dp"
+        android:layout_height="63dp"
+        android:layout_marginStart="35dp"
+        android:layout_marginBottom="28dp"
+        android:background="@drawable/ic_btn_add_full"
+        android:fontFamily="@font/verdanab"
+        android:textAlignment="center"
+        android:text="@string/AddLocation"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/button_backup_location"
+        android:layout_width="405dp"
+        android:layout_height="63dp"
+        android:layout_marginEnd="35dp"
+        android:background="@drawable/ic_btn_save_up"
+        android:paddingLeft="30dp"
+        android:fontFamily="@font/verdanab"
+        android:text="@string/BackupLocations"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/button_add_location"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/button_add_location" />
+
+    <!--android:drawablePadding="20dip"-->
+
+
+
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="350dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="8dp"
+        android:fastScrollAlwaysVisible="true"
+        android:fastScrollEnabled="false"
+        android:scrollbars="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/two_text"
+        app:layout_constraintVertical_bias="0.05"
+        tools:layout_editor_absoluteX="0dp">
+
+        <LinearLayout
+            android:id="@+id/container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+        </LinearLayout>
+    </ScrollView>
+
+</android.support.constraint.ConstraintLayout>

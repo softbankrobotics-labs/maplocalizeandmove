@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="fill_parent">
+
+    <Button
+        android:id="@+id/back_button"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/ic_btn_back"
+        android:gravity="fill"
+        android:includeFontPadding="false"
+        android:paddingStart="0dp"
+        android:paddingTop="0dp"
+        android:paddingBottom="0dp"
+        android:textAlignment="center"
+        android:textAllCaps="false"
+        android:textSize="60sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <Button
+        android:id="@+id/button_stop_save"
+        android:layout_width="405dp"
+        android:layout_height="63dp"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/ic_btn_save_down"
+        android:fontFamily="@font/verdanab"
+        android:text="@string/StopButton"
+        android:textAllCaps="true"
+        android:textColor="@color/white"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.508"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/button_retry"
+        android:layout_width="405dp"
+        android:layout_height="63dp"
+        android:layout_margin="24dp"
+        android:background="@drawable/ic_btn_save_down"
+        android:fontFamily="@font/verdanab"
+        android:text="@string/retryLocalize"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.508"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/ic_360_map"
+        android:layout_width="708dp"
+        android:layout_height="291dp"
+        android:layout_margin="10dp"
+        android:layout_marginStart="124dp"
+        android:layout_marginEnd="8dp"
+
+        android:background="@drawable/ic_360map_bg"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/main_text"
+        app:layout_constraintVertical_bias="0.396" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/localizing_at_home"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="8dp"
+
+        app:layout_constraintBottom_toBottomOf="@+id/ic_360_map"
+        app:layout_constraintEnd_toEndOf="@+id/ic_360_map"
+        app:layout_constraintStart_toStartOf="@+id/ic_360_map"
+        app:layout_constraintTop_toTopOf="@+id/ic_360_map"
+        app:layout_constraintVertical_bias="0.396"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        app:lottie_rawRes="@raw/loader" />
+
+    <ImageView
+        android:id="@+id/localizing_error"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:visibility="gone"
+        android:background="@drawable/ic_icn_localize_error"
+        app:layout_constraintBottom_toBottomOf="@+id/ic_360_map"
+        app:layout_constraintEnd_toEndOf="@+id/ic_360_map"
+        app:layout_constraintStart_toStartOf="@+id/ic_360_map"
+        app:layout_constraintTop_toTopOf="@+id/ic_360_map"
+        app:layout_constraintVertical_bias="0.396" />
+
+    <ImageView
+        android:id="@+id/warning"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="770dp"
+        android:layout_marginBottom="132dp"
+        android:background="@drawable/ic_icn_warning"
+        app:layout_constraintBottom_toBottomOf="@+id/warning_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/warning_text"
+        app:layout_constraintVertical_bias="0.146" />
+
+    <TextView
+        android:id="@+id/main_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:gravity="center"
+        android:text="@string/LocalizeRobotFragment"
+        android:textColor="@color/black"
+        android:textSize="40sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/warning_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:gravity="center"
+        android:text="@string/warningLocalization"
+        android:textColor="@color/black"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ic_360_map" />
+
+
+
+
+
+</android.support.constraint.ConstraintLayout>

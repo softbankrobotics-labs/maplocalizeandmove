@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="350dp"
+        android:layout_height="350dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="25dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_icn_save_frames" />
+
+    <TextView
+        android:id="@+id/save_position_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="100dp"
+        android:fontFamily="@font/verdanab"
+        android:text="@string/BackupLocationsConfirmation"
+        android:textSize="25sp"
+        app:layout_constraintBottom_toBottomOf="@+id/imageView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/imageView" />
+
+    <Button
+        android:id="@+id/button_cancel"
+        android:layout_width="289dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="120dp"
+        android:background="@drawable/ic_btn_del"
+        android:fontFamily="@font/verdanab"
+        android:paddingBottom="3dp"
+        android:text="@string/CancelButton"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+
+    <Button
+        android:id="@+id/button_yes"
+        android:layout_width="289dp"
+        android:layout_height="50dp"
+        android:background="@drawable/ic_btn_ok"
+        android:fontFamily="@font/verdanab"
+        android:gravity="center"
+        android:paddingBottom="3dp"
+        android:text="@string/Yes"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/button_cancel"
+        app:layout_constraintEnd_toEndOf="@+id/save_position_text"
+        app:layout_constraintTop_toTopOf="@+id/button_cancel" />
+
+
+</android.support.constraint.ConstraintLayout>

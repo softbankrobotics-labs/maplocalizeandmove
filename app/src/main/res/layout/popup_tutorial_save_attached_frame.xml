@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+        android:id="@+id/close_button"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="15dp"
+        android:background="@drawable/ic_btn_close"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/mapframe_position"
+        android:layout_width="wrap_content"
+        android:layout_height="275dp"
+        android:layout_margin="15dp"
+        android:background="@drawable/ic_ils_trap_close_ac_pepper"
+        android:padding="60dp"
+        android:textAllCaps="false"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/map_frame_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+
+        android:gravity="center"
+        android:text="@string/mapFrame"
+        android:textColor="@color/black"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/mapframe_position"
+        app:layout_constraintHorizontal_bias="0.407"
+        app:layout_constraintStart_toStartOf="@+id/mapframe_position"
+        app:layout_constraintTop_toBottomOf="@+id/mapframe_position" />
+
+    <android.support.v7.widget.LinearLayoutCompat
+        android:id="@+id/dot_follow_one"
+        android:layout_width="154dp"
+        android:layout_height="22dp"
+        android:layout_marginTop="30dp"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/map_frame_text">
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:background="@drawable/ic_dot_full" />
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_marginStart="22dp"
+            android:background="@drawable/ic_dot_outline" />
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_marginStart="22dp"
+            android:background="@drawable/ic_dot_outline" />
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_marginStart="22dp"
+            android:background="@drawable/ic_dot_outline" />
+    </android.support.v7.widget.LinearLayoutCompat>
+
+    <Button
+        android:id="@+id/button_at_home"
+        android:layout_width="405dp"
+        android:layout_height="63dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="80dp"
+
+        android:background="@drawable/ic_btn_save_down"
+        android:fontFamily="@font/verdanab"
+        android:text="@string/youAreHome"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/map_frame_text"
+        app:layout_constraintStart_toStartOf="@+id/map_frame_text"
+        app:layout_constraintTop_toBottomOf="@+id/map_frame_text" />
+
+
+    <ImageView
+        android:id="@+id/localizing_at_home"
+        android:layout_width="486dp"
+        android:layout_height="275dp"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/ic_360map_bg"
+        android:padding="60dp"
+        android:textAllCaps="false"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/localizing_at_homeBis"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/localizing_at_home"
+        app:layout_constraintEnd_toEndOf="@+id/localizing_at_home"
+        app:layout_constraintStart_toStartOf="@+id/localizing_at_home"
+        app:layout_constraintTop_toTopOf="@+id/localizing_at_home"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        app:lottie_rawRes="@raw/loader" />
+
+    <ImageView
+        android:id="@+id/localizing_error"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:background="@drawable/ic_icn_localize_error"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/localizing_at_home"
+        app:layout_constraintEnd_toEndOf="@+id/localizing_at_home"
+        app:layout_constraintStart_toStartOf="@+id/localizing_at_home"
+        app:layout_constraintTop_toTopOf="@+id/localizing_at_home"
+        app:layout_constraintVertical_bias="0.396" />
+
+    <TextView
+        android:id="@+id/localizing_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="8dp"
+        android:gravity="center"
+        android:text="@string/localizing_at_home"
+        android:textColor="@color/black"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@+id/localizing_at_home"
+        app:layout_constraintHorizontal_bias="0.407"
+        app:layout_constraintStart_toStartOf="@+id/localizing_at_home"
+        app:layout_constraintTop_toBottomOf="@+id/localizing_at_home" />
+
+    <android.support.v7.widget.LinearLayoutCompat
+        android:id="@+id/dot_follow_two"
+        android:layout_width="154dp"
+        android:layout_height="22dp"
+        android:layout_marginTop="30dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/localizing_text">
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:background="@drawable/ic_dot_outline" />
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_marginStart="22dp"
+            android:background="@drawable/ic_dot_full" />
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_marginStart="22dp"
+            android:background="@drawable/ic_dot_outline" />
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_marginStart="22dp"
+            android:background="@drawable/ic_dot_outline" />
+    </android.support.v7.widget.LinearLayoutCompat>
+
+    <Button
+        android:id="@+id/button_retry"
+        android:layout_width="405dp"
+        android:layout_height="63dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="80dp"
+        android:background="@drawable/ic_btn_save_down"
+        android:fontFamily="@font/verdanab"
+        android:text="@string/retryLocalize"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@+id/localizing_text"
+        app:layout_constraintStart_toStartOf="@+id/localizing_text"
+        app:layout_constraintTop_toBottomOf="@+id/localizing_text" />
+
+    <ImageView
+        android:id="@+id/map_position"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/ic_icn_map_positions"
+        android:textAllCaps="false"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/map_position_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="8dp"
+        android:gravity="center"
+        android:text="@string/map_position"
+        android:textColor="@color/black"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@+id/map_position"
+        app:layout_constraintHorizontal_bias="0.407"
+        app:layout_constraintStart_toStartOf="@+id/map_position"
+        app:layout_constraintTop_toBottomOf="@+id/map_position" />
+
+    <android.support.v7.widget.LinearLayoutCompat
+        android:id="@+id/dot_follow_three"
+        android:layout_width="154dp"
+        android:layout_height="22dp"
+        android:layout_marginTop="30dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/map_position_text">
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:background="@drawable/ic_dot_outline" />
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_marginStart="22dp"
+            android:background="@drawable/ic_dot_outline" />
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_marginStart="22dp"
+            android:background="@drawable/ic_dot_full" />
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_marginStart="22dp"
+            android:background="@drawable/ic_dot_outline" />
+    </android.support.v7.widget.LinearLayoutCompat>
+
+    <Button
+        android:id="@+id/button_stop_save"
+        android:layout_width="405dp"
+        android:layout_height="63dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="80dp"
+        android:background="@drawable/ic_btn_save_down"
+        android:fontFamily="@font/verdanab"
+        android:text="@string/SaveStopButton"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@+id/map_position_text"
+        app:layout_constraintStart_toStartOf="@+id/map_position_text"
+        app:layout_constraintTop_toBottomOf="@+id/map_position_text" />
+
+    <TextView
+        android:id="@+id/save_position_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:fontFamily="@font/verdanab"
+        android:text="@string/popupSaveAttachedFrame"
+        android:textSize="25sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.501"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/save_position_image"
+        android:layout_width="275dp"
+        android:layout_height="275dp"
+        android:layout_marginTop="15dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@+id/save_position_text"
+        app:layout_constraintStart_toStartOf="@+id/save_position_text"
+        app:layout_constraintTop_toBottomOf="@+id/save_position_text"
+        app:srcCompat="@drawable/ic_icn_save_frames" />
+
+    <EditText
+        android:id="@+id/position_name"
+        android:layout_width="300dp"
+        android:layout_height="63dp"
+        android:layout_marginStart="80dp"
+        android:layout_marginTop="10dp"
+        android:hint="@string/locationName"
+        android:inputType="textNoSuggestions"
+        android:privateImeOptions="nm|IME_ACTION_DONE"
+        android:textAlignment="center"
+        android:textSize="25sp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/save_position_image" />
+
+    <Button
+        android:id="@+id/button_yes"
+        android:layout_width="405dp"
+        android:layout_height="63dp"
+        android:layout_marginEnd="60dp"
+        android:background="@drawable/ic_btn_save_down"
+        android:fontFamily="@font/verdanab"
+        android:gravity="center"
+        android:paddingBottom="3dp"
+        android:text="@string/Save"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/position_name"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/position_name"
+        app:layout_constraintVertical_bias="0.941" />
+
+
+    <android.support.v7.widget.LinearLayoutCompat
+        android:id="@+id/dot_follow_four"
+        android:layout_width="154dp"
+        android:layout_height="22dp"
+        android:layout_marginTop="30dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button_yes">
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:background="@drawable/ic_dot_outline" />
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_marginStart="22dp"
+            android:background="@drawable/ic_dot_outline" />
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_marginStart="22dp"
+            android:background="@drawable/ic_dot_outline" />
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_marginStart="22dp"
+            android:background="@drawable/ic_dot_full" />
+    </android.support.v7.widget.LinearLayoutCompat>
+
+
+</android.support.constraint.ConstraintLayout>
