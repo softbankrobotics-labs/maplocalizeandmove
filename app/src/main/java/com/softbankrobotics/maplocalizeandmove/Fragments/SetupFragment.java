@@ -27,37 +27,37 @@ public class SetupFragment extends android.support.v4.app.Fragment {
                              Bundle savedInstanceState) {
         int fragmentId = R.layout.fragment_setup;
         this.ma = (MainActivity) getActivity();
-        if(ma != null){
+        if (ma != null) {
             Integer themeId = ma.getThemeId();
-            if(themeId != null){
+            if (themeId != null) {
                 final Context contextThemeWrapper = new ContextThemeWrapper(ma, themeId);
                 LayoutInflater localInflater = inflater.cloneInContext(contextThemeWrapper);
                 return localInflater.inflate(fragmentId, container, false);
-            }else{
+            } else {
                 return inflater.inflate(fragmentId, container, false);
             }
-        }else{
+        } else {
             Log.e(TAG, "could not get mainActivity, can't create fragment");
             return null;
         }
-
-
 
 
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        view.findViewById(R.id.button_localize_and_map).setOnClickListener((v) ->
-                ma.setFragment(new LocalizeAndMapFragment(),false));
+        view.findViewById(R.id.button_localize_and_map).setOnClickListener((v) -> {
+            if (!ma.askToCloseIfFlapIsOpened()) {
+                ma.setFragment(new LocalizeAndMapFragment(), false);
+            }
+        });
 
         Button menuSaveLocations = view.findViewById(R.id.menu_save_location);
-        //menuSaveLocation.setEnabled(false);
         menuSaveLocations.setOnClickListener((v) ->
-                ma.setFragment(new SaveLocationsFragment(),false));
+                ma.setFragment(new SaveLocationsFragment(), false));
 
         view.findViewById(R.id.back_button).setOnClickListener((v) ->
-                ma.setFragment(new MainFragment(),true));
+                ma.setFragment(new MainFragment(), true));
     }
 
 }

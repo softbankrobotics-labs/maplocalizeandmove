@@ -6,8 +6,8 @@ android {
         applicationId "com.softbankrobotics.maplocalizeandmove"
         minSdkVersion 23
         targetSdkVersion 28
-        versionCode 112
-        versionName "1.1.2"
+        versionCode 121
+        versionName "1.2.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         setProperty("archivesBaseName", "maplocalizeandmove-$versionName")
     }
@@ -43,8 +43,9 @@ dependencies {
         exclude group: 'com.android.support', module: 'recyclerview'
         exclude group: 'com.android.support', module: 'transition'
     }
-    implementation 'com.aldebaran:qisdk:1.5.3'
-    implementation 'com.aldebaran:qisdk-design:1.5.3'
+
+    implementation 'com.aldebaran:qisdk:1.6.7'
+    implementation 'com.aldebaran:qisdk-design:1.6.7'
 }
 repositories {
     mavenCentral()

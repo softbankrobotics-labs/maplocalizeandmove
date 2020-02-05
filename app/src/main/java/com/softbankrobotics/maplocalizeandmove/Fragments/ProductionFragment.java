@@ -2,7 +2,6 @@ package com.softbankrobotics.maplocalizeandmove.Fragments;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
@@ -48,23 +47,21 @@ public class ProductionFragment extends android.support.v4.app.Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         view.findViewById(R.id.back_button).setOnClickListener((v) ->
                 ma.setFragment(new MainFragment(), true));
-        Button startLocalizeButton =  view.findViewById(R.id.button_start_localize);
+        Button startLocalizeButton = view.findViewById(R.id.button_start_localize);
 
-        startLocalizeButton.setOnClickListener((v) ->
-                ma.setFragment(new LocalizeRobotFragment(), false));
+        startLocalizeButton.setOnClickListener((v) -> {
+            if (!ma.askToCloseIfFlapIsOpened()) {
+                ma.setFragment(new LocalizeRobotFragment(), false);
+            }
+        });
         Button goToFrameButton = view.findViewById(R.id.goToFrame);
         goToFrameButton.setOnClickListener((v) -> ma.setFragment(new GoToFrameFragment(), false));
 
-        if (ma.robotIsLocalized.get()){
+        if (ma.robotIsLocalized.get()) {
             goToFrameButton.setEnabled(true);
             goToFrameButton.setAlpha(1);
             goToFrameButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_icn_goto_frame, 0, 0);
             startLocalizeButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_icn_localize_robot_burgermenu_oklocation, 0, 0);
         }
-
-}
-
-    /*public void setTextQiVariableValue(String value){
-        ma.runOnUiThread(() -> qiVariableValue.setText(value));
-    }*/
+    }
 }

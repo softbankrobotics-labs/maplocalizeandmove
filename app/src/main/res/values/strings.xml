@@ -59,4 +59,9 @@
     <string name="stay_away_mapping">Please stay away from me during initial mapping!</string>
     <string name="stay_away_localizing">Please stay away from me while I localize myself!</string>
     <string name="LocationReached">Location Reached</string>
+    <string name="goto_random">GoTo random</string>
+    <string name="gotomaxspeed">GoToMaxSpeed\ \ \ \ </string>
+    <string name="gotostraight">GoToStraight\ \ \ \ </string>
+    <string name="stop_random">Stop random</string>
+    <string name="multiplepointsinarow">MultiplePointsInARow\ \ \ \ \ </string>
 </resources>

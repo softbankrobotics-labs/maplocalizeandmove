@@ -1,8 +1,5 @@
 package com.softbankrobotics.maplocalizeandmove.Fragments;
 
-import android.app.ActionBar;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -14,10 +11,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.aldebaran.qi.sdk.object.actuation.AttachedFrame;
 import com.softbankrobotics.maplocalizeandmove.MainActivity;
 import com.softbankrobotics.maplocalizeandmove.R;
 import com.softbankrobotics.maplocalizeandmove.Utils.Popup;
@@ -30,13 +28,12 @@ public class GoToFrameFragment extends android.support.v4.app.Fragment {
 
     private static final String TAG = "GoToFrameFragment";
     public Popup goToPopup;
-    private MainActivity ma;
-    private View localView;
     public ImageView check;
     public TextView goto_text;
     public ImageView cross;
     public LottieAnimationView goto_loader;
-
+    private MainActivity ma;
+    private View localView;
 
     /**
      * inflates the layout associated with this fragment
@@ -47,16 +44,16 @@ public class GoToFrameFragment extends android.support.v4.app.Fragment {
                              Bundle savedInstanceState) {
         int fragmentId = R.layout.fragment_goto_frame;
         this.ma = (MainActivity) getActivity();
-        if(ma != null){
+        if (ma != null) {
             Integer themeId = ma.getThemeId();
-            if(themeId != null){
+            if (themeId != null) {
                 final Context contextThemeWrapper = new ContextThemeWrapper(ma, themeId);
                 LayoutInflater localInflater = inflater.cloneInContext(contextThemeWrapper);
                 return localInflater.inflate(fragmentId, container, false);
-            }else{
+            } else {
                 return inflater.inflate(fragmentId, container, false);
             }
-        }else{
+        } else {
             Log.e(TAG, "could not get mainActivity, can't create fragment");
             return null;
         }
@@ -68,20 +65,43 @@ public class GoToFrameFragment extends android.support.v4.app.Fragment {
         view.findViewById(R.id.back_button).setOnClickListener((v) ->
                 ma.setFragment(new ProductionFragment(), true));
 
+        Button goToRandomButton = view.findViewById(R.id.goto_random);
+        Button stopGoToRandomButton = view.findViewById(R.id.stop_goto_random);
+        stopGoToRandomButton.setAlpha((float) 0.5);
+
+        goToRandomButton.setOnClickListener((v) -> {
+            ma.goToRandomLocation(true);
+            goToRandomButton.setEnabled(false);
+            goToRandomButton.setAlpha((float) 0.5);
+            stopGoToRandomButton.setEnabled(true);
+            stopGoToRandomButton.setAlpha(1);
+
+        });
+
+        stopGoToRandomButton.setOnClickListener((v) -> {
+            ma.goToRandomLocation(false);
+            stopGoToRandomButton.setEnabled(false);
+            stopGoToRandomButton.setAlpha((float) 0.5);
+            goToRandomButton.setEnabled(true);
+            goToRandomButton.setAlpha(1);
+        });
+
+        Switch goToMaxSpeedSwitch = view.findViewById(R.id.gotomaxspeed);
+        goToMaxSpeedSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> ma.goToMaxSpeed = isChecked);
+
+        Switch goToStraightSwitch = view.findViewById(R.id.gotostraight);
+        goToStraightSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> ma.goToStraight = isChecked);
         displayLocations();
     }
 
     public void createGoToPopup() {
         goToPopup = new Popup(R.layout.popup_goto, this, ma);
-
         goto_loader = goToPopup.inflator.findViewById(R.id.goto_loader);
         check = goToPopup.inflator.findViewById(R.id.check);
         goto_text = goToPopup.inflator.findViewById(R.id.goto_text);
         cross = goToPopup.inflator.findViewById(R.id.cross);
         Button close_button = goToPopup.inflator.findViewById(R.id.close_button);
-        close_button.setOnClickListener((v) -> {
-            goToPopup.dialog.hide();
-        });
+        close_button.setOnClickListener((v) -> goToPopup.dialog.hide());
     }
 
     private void displayLocations() {
@@ -102,10 +122,10 @@ public class GoToFrameFragment extends android.support.v4.app.Fragment {
             linearLayout.removeAllViews();
 
             //Adding mapFrame in List
-            LinearLayout mapFrameLayout = (LinearLayout)inflater.inflate(R.layout.item_location_list_goto, null);
+            LinearLayout mapFrameLayout = (LinearLayout) inflater.inflate(R.layout.item_location_list_goto, null);
             TextView mapFrameName = (TextView) mapFrameLayout.getChildAt(1);
             mapFrameName.setText("MapFrame");
-            ImageView separationList =  new ImageView(this.getContext());
+            ImageView separationList = new ImageView(this.getContext());
             separationList.setImageResource(R.drawable.ic_separation_list);
             Button goToFrameButton = (Button) mapFrameLayout.getChildAt(2);
             goToFrameButton.setOnClickListener((useless) -> {
@@ -116,17 +136,16 @@ public class GoToFrameFragment extends android.support.v4.app.Fragment {
             linearLayout.addView(separationList);
 
             //Adding all locations loaded in list
-            Iterator it = ma.savedLocations.entrySet().iterator();
-            while (it.hasNext()) {
-                Map.Entry pair = (Map.Entry) it.next();
-                LinearLayout v = (LinearLayout)inflater.inflate(R.layout.item_location_list_goto, null);
+            for (Map.Entry<String, AttachedFrame> stringAttachedFrameEntry : ma.savedLocations.entrySet()) {
+                Map.Entry pair = (Map.Entry) stringAttachedFrameEntry;
+                LinearLayout v = (LinearLayout) inflater.inflate(R.layout.item_location_list_goto, null);
                 TextView locationName = (TextView) v.getChildAt(1);
                 locationName.setText(pair.getKey().toString());
-                ImageView separationListbis =  new ImageView(this.getContext());
+                ImageView separationListbis = new ImageView(this.getContext());
                 separationListbis.setImageResource(R.drawable.ic_separation_list);
                 Button goToButton = (Button) v.getChildAt(2);
                 goToButton.setOnClickListener((useless) -> {
-                    Log.d(TAG, "Goto Frame: "+ pair.getKey().toString());
+                    Log.d(TAG, "Goto Frame: " + pair.getKey().toString());
                     ma.goToLocation(pair.getKey().toString());
                 });
                 linearLayout.addView(v);
@@ -140,9 +159,9 @@ public class GoToFrameFragment extends android.support.v4.app.Fragment {
     private void noLocationsToLoad() {
         Popup noLocationsPopup = new Popup(R.layout.popup_no_locations_to_load, this, ma);
         Button close = noLocationsPopup.inflator.findViewById(R.id.close_button);
-        close.setOnClickListener((v) ->{
+        close.setOnClickListener((v) -> {
             noLocationsPopup.dialog.hide();
-            ma.setFragment(new MainFragment(),true);
+            ma.setFragment(new MainFragment(), true);
         });
         noLocationsPopup.dialog.show();
     }

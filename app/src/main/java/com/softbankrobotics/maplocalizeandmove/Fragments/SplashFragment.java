@@ -26,16 +26,16 @@ public class SplashFragment extends android.support.v4.app.Fragment {
                              Bundle savedInstanceState) {
         int fragmentId = R.layout.fragment_splash;
         this.ma = (MainActivity) getActivity();
-        if(ma != null){
+        if (ma != null) {
             Integer themeId = ma.getThemeId();
-            if(themeId != null){
+            if (themeId != null) {
                 final Context contextThemeWrapper = new ContextThemeWrapper(ma, themeId);
                 LayoutInflater localInflater = inflater.cloneInContext(contextThemeWrapper);
                 return localInflater.inflate(fragmentId, container, false);
-            }else{
+            } else {
                 return inflater.inflate(fragmentId, container, false);
             }
-        }else{
+        } else {
             Log.e(TAG, "could not get mainActivity, can't create fragment");
             return null;
         }

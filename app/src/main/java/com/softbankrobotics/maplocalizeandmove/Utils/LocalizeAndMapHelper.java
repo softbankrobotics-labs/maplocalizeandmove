@@ -4,12 +4,15 @@ import android.util.Log;
 
 import com.aldebaran.qi.Future;
 import com.aldebaran.qi.sdk.QiContext;
+import com.aldebaran.qi.sdk.builder.AnimateBuilder;
+import com.aldebaran.qi.sdk.builder.AnimationBuilder;
 import com.aldebaran.qi.sdk.builder.ExplorationMapBuilder;
 import com.aldebaran.qi.sdk.builder.LocalizeAndMapBuilder;
 import com.aldebaran.qi.sdk.builder.LocalizeBuilder;
 import com.aldebaran.qi.sdk.object.actuation.ExplorationMap;
 import com.aldebaran.qi.sdk.object.actuation.Localize;
 import com.aldebaran.qi.sdk.object.actuation.LocalizeAndMap;
+import com.softbankrobotics.maplocalizeandmove.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,27 +32,16 @@ import java.util.List;
  */
 public class LocalizeAndMapHelper {
 
-    public enum LocalizationStatus {
-        LOCALIZED,
-        MAP_MISSING,
-        FAILED,
-        CANCELLED,
-        FINISHED
-    }
-
-    private QiContext qiContext; // The QiContext provided by the QiSDK.
     private static final String TAG = "MSILocalizeAndMapHelper";
-
+    private QiContext qiContext; // The QiContext provided by the QiSDK.
     private Future<Void> currentlyRunningLocalize;
     private LocalizeAndMap currentLocalizeAndMap;
     private String currentExplorationMap;
-
     private List<onStartedLocalizingListener> startedLocalizingListeners;
     private List<onFinishedLocalizingListener> finishedLocalizingListeners;
     private List<onStartedMappingListener> startedMappingListeners;
     private List<onFinishedMappingListener> finishedMappingListeners;
     private Localize builtLocalize;
-
     /**
      * Constructor: call me in your `onCreate`
      */
@@ -64,6 +56,7 @@ public class LocalizeAndMapHelper {
 
     /**
      * Call me in your `onRobotFocusGained`
+     *
      * @param qc the qiContext provided to your Activity
      */
     void onRobotFocusGained(QiContext qc) {
@@ -75,11 +68,26 @@ public class LocalizeAndMapHelper {
      */
     void onRobotFocusLost() {
         // Remove the QiContext.
+        try {
+            builtLocalize.removeAllOnStatusChangedListeners();
+        } catch (Exception e) {
+            Log.d(TAG, "onRobotFocusLost: Exception e : " + e.toString());
+        }
         qiContext = null;
     }
 
     /**
+     * Dump and extract the current map from the current mapping.
+     *
+     * @return the map as a String, for you to backup into a file.
+     */
+    public String getMap() {
+        return currentExplorationMap;
+    }
+
+    /**
      * Force-feed the map in case you saved it into a file.
+     *
      * @param map the map you previously saved from `getMap`
      */
     public void setMap(String map) {
@@ -88,16 +96,9 @@ public class LocalizeAndMapHelper {
     }
 
     /**
-     * Dump and extract the current map from the current mapping.
-     * @return the map as a String, for you to backup into a file.
-     */
-    public String getMap() {
-        return currentExplorationMap;
-    }
-
-    /**
      * checks if a previous localize or localizeAndMap was running and cancels it. This is
      * for making sure you don't run both at the same time (not possible on Pepper)
+     *
      * @return Future that will complete when the action is cancelled.
      */
     private Future<Void> checkAndCancelCurrentLocalize() {
@@ -110,6 +111,7 @@ public class LocalizeAndMapHelper {
      * start localizing: the robot will look around and try to find out where it is.<br/>
      * <strong>important:</strong> your need to load a Map before being able to localize, so don't
      * forget to call setMap or run a localizeAndMap.
+     *
      * @return Future that will complete when you stop localize
      */
     public Future<Void> localize() {
@@ -117,7 +119,7 @@ public class LocalizeAndMapHelper {
 
         return checkAndCancelCurrentLocalize()
                 .thenApply(aUselessFuture -> {
-                    if(builtLocalize != null) {
+                    if (builtLocalize != null) {
                         return builtLocalize;
                     } else {
                         try {
@@ -140,13 +142,13 @@ public class LocalizeAndMapHelper {
                     return currentlyRunningLocalize;
                 })
                 .thenConsume(finishedLocalize -> {
-                    if(finishedLocalize.isCancelled()) {
+                    if (finishedLocalize.isCancelled()) {
                         Log.d(TAG, "localize cancelled.");
                         raiseFinishedLocalizing(LocalizationStatus.CANCELLED);
-                    } else if(finishedLocalize.hasError()) {
+                    } else if (finishedLocalize.hasError()) {
                         Log.d(TAG, "Failed to localize in map", finishedLocalize.getError());
                         //The error below is present in 2.9.3.114 when trying to run multiple Localize action with the same Localize object (called builtLocalize here)
-                        if(finishedLocalize.getError().toString().equals("com.aldebaran.qi.QiException: tr1::bad_weak_ptr")){
+                        if (finishedLocalize.getError().toString().equals("com.aldebaran.qi.QiException: tr1::bad_weak_ptr")) {
                             Log.d(TAG, "localize: com.aldebaran.qi.QiException: tr1::bad_weak_ptr");
                             builtLocalize.removeAllOnStatusChangedListeners();
                             builtLocalize = null;
@@ -166,9 +168,10 @@ public class LocalizeAndMapHelper {
      * <br/>
      * Use this mode to push the robot around to make it learn its environment. Make sure to well
      * stay behind the robot.
+     *
      * @return Future that will complete when you stop localizeAndMap
      */
-    public Future<Void> localizeAndMap()  {
+    public Future<Void> localizeAndMap() {
         raiseStartedMapping();
         return checkAndCancelCurrentLocalize()
                 .thenCompose(aUselessVoid -> LocalizeAndMapBuilder.with(qiContext).buildAsync())
@@ -185,26 +188,33 @@ public class LocalizeAndMapHelper {
                         raiseFinishedMapping(false);
                     } else {
                         Log.d(TAG, "LocalizeAndMap finished with success.");
-                        currentLocalizeAndMap.async().dumpMap()
-                                .andThenConsume(dumpedMap -> setMap(dumpedMap.serialize()))
-                                .thenConsume(f -> {
-                                    if (f.hasError()) {
-                                        Log.w(TAG, "map dump finished with error: ", f.getError());
-                                        raiseFinishedMapping(false);
-                                    } else {
-                                        Log.d(TAG, "map dump finished with success.");
-                                        raiseFinishedMapping(true);
-                                    }
-                                });
+
+                        try {
+                            currentLocalizeAndMap.async().dumpMap()
+                                    .andThenConsume(dumpedMap -> setMap(dumpedMap.serialize()))
+                                    .thenConsume(f -> {
+                                        if (f.hasError()) {
+                                            Log.w(TAG, "map dump finished with error: ", f.getError());
+                                            raiseFinishedMapping(false);
+                                        } else {
+                                            Log.d(TAG, "map dump finished with success.");
+                                            raiseFinishedMapping(true);
+                                        }
+                                    });
+                        } catch (Exception e) {
+                            Log.d(TAG, "localizeAndMap: dump exception : " + e.toString());
+                        } catch (OutOfMemoryError e) {
+                            Log.d(TAG, "localizeAndMap: dump/outOfMemoryError : " + e.toString());
+                        }
                     }
                     currentLocalizeAndMap.removeAllOnStatusChangedListeners();
                     currentLocalizeAndMap = null;
-
                 });
     }
 
     /**
      * Stop the currently running localize or localizeAndMap.
+     *
      * @return A Future that will complete when the action is cancelled.
      */
     public Future<Void> stopCurrentAction() {
@@ -213,39 +223,39 @@ public class LocalizeAndMapHelper {
 
     /**
      * Callback for localize status changes. When the status is "localized" then it raises
-     * the callback for the UI. 
+     * the callback for the UI.
      */
     private void checkStatusAndRaiseLocalized(com.aldebaran.qi.sdk.object.actuation.LocalizationStatus status) {
         if (status == com.aldebaran.qi.sdk.object.actuation.LocalizationStatus.LOCALIZED) {
             Log.d(TAG, "Robot is localized");
             raiseFinishedLocalizing(LocalizationStatus.LOCALIZED);
+            // Put back if it improves the performances.
+            //animationToLookInFront();
         }
     }
 
-    /**
-     * Little helper for the UI to subscribe to the current state of localize/map
-     * This has nothing to do with the robot, but is for helping in the MainActivity to enable
-     * or disable functions during an action.
-     */
-    public interface onStartedLocalizingListener {
-        void onStartedLocalizing();
-    }
-
-    public interface onFinishedLocalizingListener {
-        void onFinishedLocalizing(LocalizationStatus result);
-    }
-
-    public interface onStartedMappingListener {
-        void onStartedMapping();
-    }
-
-    public interface onFinishedMappingListener {
-        void onFinishedMapping(boolean success);
+    public Future<Void> animationToLookInFront() {
+        return AnimationBuilder.with(qiContext) // Create the builder with the context.
+                .withResources(R.raw.idle) // Set the animation resource.
+                .buildAsync().andThenCompose(animation -> AnimateBuilder.with(qiContext)
+                        .withAnimation(animation)
+                        .buildAsync().andThenCompose(animate -> animate.async().run()));
     }
 
     public void addOnStartedLocalizingListener(onStartedLocalizingListener f) {
         startedLocalizingListeners.add(f);
     }
+
+    /*public Future<Void> animationToLookInFront() {
+        Animation animation = AnimationBuilder.with(qiContext) // Create the builder with the context.
+                .withResources(R.raw.idle) // Set the animation resource.
+                .buildAsync().getValue();
+
+        Animate animate = AnimateBuilder.with(qiContext)
+                .withAnimation(animation)
+                .buildAsync().getValue();
+        return animate.async().run();
+    }*/
 
     public void addOnFinishedLocalizingListener(onFinishedLocalizingListener f) {
         finishedLocalizingListeners.add(f);
@@ -276,28 +286,57 @@ public class LocalizeAndMapHelper {
     }
 
     private void raiseStartedLocalizing() {
-        for (onStartedLocalizingListener f: startedLocalizingListeners){
+        for (onStartedLocalizingListener f : startedLocalizingListeners) {
             f.onStartedLocalizing();
         }
     }
 
     public void raiseFinishedLocalizing(LocalizationStatus result) {
-        for (onFinishedLocalizingListener f: finishedLocalizingListeners){
-            Log.d(TAG, "raiseFinishedLocalizing: f"+f);
-            Log.d(TAG, "raiseFinishedLocalizing: builtLocalize"+builtLocalize);
+        for (onFinishedLocalizingListener f : finishedLocalizingListeners) {
+            Log.d(TAG, "raiseFinishedLocalizing: f" + f);
+            Log.d(TAG, "raiseFinishedLocalizing: builtLocalize" + builtLocalize);
             f.onFinishedLocalizing(result);
         }
     }
 
     private void raiseStartedMapping() {
-        for (onStartedMappingListener f: startedMappingListeners){
+        for (onStartedMappingListener f : startedMappingListeners) {
             f.onStartedMapping();
         }
     }
 
     private void raiseFinishedMapping(boolean success) {
-        for (onFinishedMappingListener f: finishedMappingListeners){
+        for (onFinishedMappingListener f : finishedMappingListeners) {
             f.onFinishedMapping(success);
         }
+    }
+
+    public enum LocalizationStatus {
+        LOCALIZED,
+        MAP_MISSING,
+        FAILED,
+        CANCELLED,
+        FINISHED
+    }
+
+    /**
+     * Little helper for the UI to subscribe to the current state of localize/map
+     * This has nothing to do with the robot, but is for helping in the MainActivity to enable
+     * or disable functions during an action.
+     */
+    public interface onStartedLocalizingListener {
+        void onStartedLocalizing();
+    }
+
+    public interface onFinishedLocalizingListener {
+        void onFinishedLocalizing(LocalizationStatus result);
+    }
+
+    public interface onStartedMappingListener {
+        void onStartedMapping();
+    }
+
+    public interface onFinishedMappingListener {
+        void onFinishedMapping(boolean success);
     }
 }

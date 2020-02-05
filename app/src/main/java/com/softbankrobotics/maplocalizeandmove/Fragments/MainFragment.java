@@ -26,16 +26,16 @@ public class MainFragment extends android.support.v4.app.Fragment {
                              Bundle savedInstanceState) {
         int fragmentId = R.layout.fragment_main;
         this.ma = (MainActivity) getActivity();
-        if(ma != null){
+        if (ma != null) {
             Integer themeId = ma.getThemeId();
-            if(themeId != null){
+            if (themeId != null) {
                 final Context contextThemeWrapper = new ContextThemeWrapper(ma, themeId);
                 LayoutInflater localInflater = inflater.cloneInContext(contextThemeWrapper);
                 return localInflater.inflate(fragmentId, container, false);
-            }else{
+            } else {
                 return inflater.inflate(fragmentId, container, false);
             }
-        }else{
+        } else {
             Log.e(TAG, "could not get mainActivity, can't create fragment");
             return null;
         }
@@ -46,9 +46,9 @@ public class MainFragment extends android.support.v4.app.Fragment {
         /*view.findViewById(R.id.back_button).setOnClickListener(
                 (v) -> ma.setFragment(new MainFragment(),true));*/
         view.findViewById(R.id.button_setup_mode).setOnClickListener(
-                (v) -> ma.setFragment(new SetupFragment(),false));
+                (v) -> ma.setFragment(new SetupFragment(), false));
         view.findViewById(R.id.button_production_mode).setOnClickListener(
-                (v) -> ma.setFragment(new ProductionFragment(),false));
+                (v) -> ma.setFragment(new ProductionFragment(), false));
     }
 
 }

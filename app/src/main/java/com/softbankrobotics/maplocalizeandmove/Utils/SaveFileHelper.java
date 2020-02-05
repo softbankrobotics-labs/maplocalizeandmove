@@ -21,8 +21,8 @@ public class SaveFileHelper {
 
     private static String TAG = "MSI_SaveFileHelper";
 
-    public Map<String, Vector2> getLocationsFromFile(Context applicationContext) {
-        Map<String, Vector2> vectors = null;
+    public Map<String, Vector2theta> getLocationsFromFile(Context applicationContext) {
+        Map<String, Vector2theta> vectors = null;
         FileInputStream fis = null;
         ObjectInputStream ois = null;
         try {
@@ -33,7 +33,6 @@ public class SaveFileHelper {
         } catch (IOException | ClassNotFoundException e) {
             Log.e(TAG, e.getMessage(), e);
         } finally {
-            //TODO
             try {
                 if (ois != null) {
                     ois.close();
@@ -48,7 +47,7 @@ public class SaveFileHelper {
         return vectors;
     }
 
-    public void saveLocationsToFile(Context applicationContext, Map<String, Vector2> locationsToBackup) {
+    public void saveLocationsToFile(Context applicationContext, Map<String, Vector2theta> locationsToBackup) {
         FileOutputStream fos = null;
         ObjectOutputStream oos = null;
 
@@ -63,7 +62,6 @@ public class SaveFileHelper {
         } catch (IOException e) {
             Log.e(TAG, e.getMessage(), e);
         } finally {
-            //TODO
             try {
                 if (oos != null) {
                     oos.close();
@@ -127,7 +125,6 @@ public class SaveFileHelper {
             Log.d(TAG, "Can not read file: " + e.getMessage(), e);
             return "Can not read file";
         } finally {
-            //TODO
             try {
                 if (inputStream != null) {
                     inputStream.close();

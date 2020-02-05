@@ -19,23 +19,25 @@
 
     <ImageView
         android:id="@+id/cross"
-        android:layout_width="500dp"
-        android:layout_height="500dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="@drawable/ic_icn_goto_frame_error" />
+        android:background="@drawable/ic_icn_goto_frame_error_update" />
 
     <ImageView
         android:id="@+id/check"
-        android:layout_width="500dp"
-        android:layout_height="500dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="@drawable/ic_icn_goto_frame_ok" />
+        android:background="@drawable/ic_icn_goto_frame_ok_update" />
 
     <TextView
         android:id="@+id/goto_text"

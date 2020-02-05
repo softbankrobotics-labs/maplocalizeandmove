@@ -18,14 +18,10 @@ public class Popup {
         inflator = inflaterPopup.inflate(layout, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(ma);
 
-        int options =
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
-                        | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
-                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
-        inflator.setSystemUiVisibility(options);
+        setSystemUiVisibilityMode();
+        inflator.setOnSystemUiVisibilityChangeListener(visibility -> {
+            setSystemUiVisibilityMode(); // Needed to avoid exiting immersive_sticky when keyboard is displayed
+        });
 
         builder.setView(inflator);
         dialog = builder.create();
@@ -34,5 +30,18 @@ public class Popup {
         lp.copyFrom(dialog.getWindow().getAttributes());
         lp.width = WindowManager.LayoutParams.MATCH_PARENT;
         lp.height = WindowManager.LayoutParams.MATCH_PARENT;
+    }
+
+    private void setSystemUiVisibilityMode() {
+
+        int options;
+        options = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+                | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+
+        inflator.setSystemUiVisibility(options);
     }
 }
