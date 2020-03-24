@@ -2,7 +2,7 @@ package com.softbankrobotics.maplocalizeandmove.Fragments;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
@@ -12,10 +12,12 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
+import androidx.fragment.app.Fragment;
+
 import com.softbankrobotics.maplocalizeandmove.MainActivity;
 import com.softbankrobotics.maplocalizeandmove.R;
 
-public class LoadingFragment extends android.support.v4.app.Fragment {
+public class LoadingFragment extends Fragment {
 
     private static final String TAG = "MSI_LoadingFragment";
     private MainActivity ma;

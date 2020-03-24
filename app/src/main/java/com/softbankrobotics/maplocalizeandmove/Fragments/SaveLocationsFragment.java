@@ -3,13 +3,14 @@ package com.softbankrobotics.maplocalizeandmove.Fragments;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.LinearLayoutCompat;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.LinearLayoutCompat;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -18,6 +19,8 @@ import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import androidx.fragment.app.Fragment;
+
 import com.airbnb.lottie.LottieAnimationView;
 import com.aldebaran.qi.sdk.object.actuation.AttachedFrame;
 import com.softbankrobotics.maplocalizeandmove.MainActivity;
@@ -25,11 +28,10 @@ import com.softbankrobotics.maplocalizeandmove.R;
 import com.softbankrobotics.maplocalizeandmove.Utils.LocalizeAndMapHelper;
 import com.softbankrobotics.maplocalizeandmove.Utils.Popup;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-public class SaveLocationsFragment extends android.support.v4.app.Fragment {
+public class SaveLocationsFragment extends Fragment {
 
     private static final String TAG = "MSI_SaveLocations";
     public ImageView locationsSaved;
@@ -99,20 +101,20 @@ public class SaveLocationsFragment extends android.support.v4.app.Fragment {
         });
 
         localView.findViewById(R.id.button_backup_location).setOnClickListener((v) -> {
+            displayPopupLocationsSaved();
             ma.backupLocations();
-            displaypPopupLocationsSaved();
         });
         localView.findViewById(R.id.button_add_location).setOnClickListener((v) -> popupTutorialSaveAttachedFrame());
 
         Switch multiplePointsInARow = view.findViewById(R.id.multiplepointsinarow);
         multiplePointsInARow.setOnCheckedChangeListener((buttonView, isChecked) -> saveMultiplePointsInARow = isChecked);
+        multiplePointsInARow.setChecked(true);
 
         displayLocations();
     }
 
     private void displayPopupConfirmation() {
         Popup displayPopup = new Popup(R.layout.popup_backup_locations_confirmation, this, ma);
-
 
         displayPopup.inflator.findViewById(R.id.button_cancel).setOnClickListener(view -> displayPopup.dialog.hide());
         displayPopup.inflator.findViewById(R.id.button_yes).setOnClickListener(view -> {
@@ -131,6 +133,7 @@ public class SaveLocationsFragment extends android.support.v4.app.Fragment {
         close.setOnClickListener((v) -> {
             tutorialPopup.dialog.hide();
             displayLocations();
+            ma.robotHelper.releaseAbilities();
         });
 
 
@@ -238,9 +241,11 @@ public class SaveLocationsFragment extends android.support.v4.app.Fragment {
             tutorialPopup.inflator.findViewById(R.id.button_yes).setOnClickListener((w) -> {
                 if (!position_name.getText().toString().equalsIgnoreCase("")) {
                     ma.saveLocation(position_name.getText().toString()).andThenConsume(voidFuture -> {
-                        Log.d(TAG, "popupTutorialSaveAttachedFrame: ButtonYes");
+                        Log.d(TAG, "popupTutorialSaveAttachedFrame: ButtonSave");
                         ma.runOnUiThread(() -> {
                             locationsListModified = true;
+                            position_name.setText("");
+
                             if (saveMultiplePointsInARow) {
                                 position_name.setVisibility(View.GONE);
                                 save_position_text.setVisibility(View.GONE);
@@ -248,6 +253,16 @@ public class SaveLocationsFragment extends android.support.v4.app.Fragment {
                                 button_yes.setVisibility(View.GONE);
                                 dot_follow_four.setVisibility(View.GONE);
                                 display3rdStep();
+                                try {
+                                    InputMethodManager inputManager =
+                                            (InputMethodManager) ma.getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                                    inputManager.hideSoftInputFromWindow(
+                                            tutorialPopup.inflator.findViewById(R.id.button_yes).getWindowToken(),
+                                            InputMethodManager.HIDE_NOT_ALWAYS);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    Log.d(TAG, "sendMail: keyboard error : " + e);
+                                }
                             } else {
                                 tutorialPopup.dialog.hide();
                                 displayLocations();
@@ -318,7 +333,7 @@ public class SaveLocationsFragment extends android.support.v4.app.Fragment {
         noMapPopup.dialog.show();
     }
 
-    public void displaypPopupLocationsSaved() {
+    public void displayPopupLocationsSaved() {
         savingLocationsPopup = new Popup(R.layout.popup_map_saved, this, ma);
         Button close_button = savingLocationsPopup.inflator.findViewById(R.id.close_button);
         close_button.setOnClickListener((v) -> savingLocationsPopup.dialog.hide());

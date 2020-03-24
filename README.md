@@ -1,5 +1,5 @@
 # MapLocalizeAndMove
-Article updated on 5/02/2020
+**Article and code updated on 24/03/2020**
 
 Navigation tutorial for Pepper running on Android.
 
@@ -44,7 +44,28 @@ During this step, the robot will also learn the paths to navigate through the ma
 Last, if you know some places are key positions where the robot may need to relocalize, then stop and make a 360° at that place, so the robot takes pictures all around and not only in front.
 
 ###### 1.8 robots (better performances)
-During this step, the robot uses its cameras (to do Visual SLAM, constant relocalization with image comparison) and odometry to map its environment. Also ideally hold the tracking so the head stays in the front of the robot, and move slowly so the pictures are of good quality and Pepper can record more of them. *It is now possible to make loops in your app.*  And this is even Better.
+During this step, the robot uses its stereo cameras. They work as two smartphones cameras but in grayscale (no color). It does Visual SLAM, constant relocalization with image comparison and odometry to map its environment.
+A visual landmark detection is performed, we try to match contrasted corners. Pictures are not saved, only mathematical data associated to it.
+
+1. Try to maximize the amount of texture in the environment:
+* Good :  posters, plants, random stuff
+* Bad : empty white wall
+
+2. You should try to avoid blur during LocalizeAndMap and minimize it during Localize actions. In order to do that:
+* For lighting conditions we recommend 300lux minimum and 500lux or more as nice too have criteria.
+* Try to have a moving speed of the robot of 0.3m.s-1 during LocalizeAndMap (or less).
+
+3. Try to avoid obstructions of the cameras during LocalizeAndMap. Try avoiding people standing in front of the robot during LocalizeAndMap. If you push the robot, push it from the back.
+
+4. Make the robot move (pushing or joystick) along the desired navigation path (route) during the Localize and map. It will help localizing during production mode as the robot sees the same pictures then.
+* Keep head angles at 0 degrees (pitch an yaw) during the LocalizeAndMap. It helps seeing the same pictures in production mode (better than looking at the floor or the ceiling).
+* During localizeAndMap, make the robot move as if it was a car and the tablet is the front of the car. It helps taking pictures in front of the robot (then the robot will navigate this way).
+
+5. Try to come back exactly at the starting position before finishing (cancel) the LocalizeAndMap. It helps improving the consistency of the map.
+
+*It is now possible to make loops in your app.*  And this is even Better.
+
+Also ideally hold the tracking so the head stays in the front of the robot, and move slowly so the pictures are of good quality and Pepper can record more of them. *It is now possible to make loops in your app.*  And this is even Better.
 
 **When doing the map, it is necessary to go along the robot path in both directions to able the robot to take pictures of its environnement in both directions. Then, when it will navigate, it will be able to localize itself in both directions.
 Always go back to the MapFrame when you are done mapping before stopping the LocalizeAndMap action and saving the map.**
@@ -200,14 +221,18 @@ Write a function  "locationsToBackup" into a file, using "ObjectOutputStream" fo
 
 <pre><code class="java">
 public void saveLocationsToFile(Context applicationContext, Map<String, Vector2theta> locationsToBackup) {
+
+        Gson gson=new Gson();
+        String points =gson.toJson(locationsToBackup);
+
         FileOutputStream fos = null;
         ObjectOutputStream oos = null;
 
         // Backup list into a file
         try {
-            fos = new FileOutputStream(new File(applicationContext.getFilesDir(), "hashmap.ser"));
+            fos = new FileOutputStream(new File(applicationContext.getFilesDir(), "points.json"));
             oos = new ObjectOutputStream(fos);
-            oos.writeObject(locationsToBackup);
+            oos.writeObject(points);
             Log.d(TAG, "backupLocations: Done");
         } catch (FileNotFoundException e) {
             Log.e(TAG, e.getMessage(), e);
@@ -284,7 +309,7 @@ private void loadLocations() {
 	
         return FutureUtils.futureOf((f) -> {
             // Read file into a temporary hashmap
-            File file = new File(getFilesDir(), "hashmap.ser");
+            File file = new File(getFilesDir(), "points.json");
             if (file.exists()) {
                 // Read file into a temporary hashmap, for example using "ObjectInputStream"
                 Map<String, Vector2theta> vectors = saveFileHelper.getLocationsFromFile(getApplicationContext());

@@ -3,6 +3,9 @@ package com.softbankrobotics.maplocalizeandmove.Utils;
 import android.content.Context;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,6 +17,7 @@ import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,9 +30,12 @@ public class SaveFileHelper {
         FileInputStream fis = null;
         ObjectInputStream ois = null;
         try {
-            fis = new FileInputStream(new File(applicationContext.getFilesDir(), "hashmap.ser"));
+            fis = new FileInputStream(new File(applicationContext.getFilesDir(), "points.json"));
             ois = new ObjectInputStream(fis);
-            vectors = (HashMap) ois.readObject();
+            String points=(String) ois.readObject();
+            Type collectionType = new TypeToken<Map<String, Vector2theta>>(){}.getType();
+            Gson gson=new Gson();
+            vectors = gson.fromJson(points, collectionType);
 
         } catch (IOException | ClassNotFoundException e) {
             Log.e(TAG, e.getMessage(), e);
@@ -48,14 +55,18 @@ public class SaveFileHelper {
     }
 
     public void saveLocationsToFile(Context applicationContext, Map<String, Vector2theta> locationsToBackup) {
+
+        Gson gson=new Gson();
+        String points =gson.toJson(locationsToBackup);
+
         FileOutputStream fos = null;
         ObjectOutputStream oos = null;
 
         // Backup list into a file
         try {
-            fos = new FileOutputStream(new File(applicationContext.getFilesDir(), "hashmap.ser"));
+            fos = new FileOutputStream(new File(applicationContext.getFilesDir(), "points.json"));
             oos = new ObjectOutputStream(fos);
-            oos.writeObject(locationsToBackup);
+            oos.writeObject(points);
             Log.d(TAG, "backupLocations: Done");
         } catch (FileNotFoundException e) {
             Log.e(TAG, e.getMessage(), e);

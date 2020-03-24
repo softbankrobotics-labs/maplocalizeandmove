@@ -2,7 +2,6 @@ package com.softbankrobotics.maplocalizeandmove.Fragments;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
@@ -10,6 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.aldebaran.qi.sdk.util.FutureUtils;
@@ -20,7 +22,7 @@ import com.softbankrobotics.maplocalizeandmove.Utils.Popup;
 
 import java.util.concurrent.TimeUnit;
 
-public class LocalizeRobotFragment extends android.support.v4.app.Fragment {
+public class LocalizeRobotFragment extends Fragment {
 
     private static final String TAG = "MSI_LocalizeRobot";
     private MainActivity ma;
@@ -76,11 +78,12 @@ public class LocalizeRobotFragment extends android.support.v4.app.Fragment {
 
         ma.robotHelper.localizeAndMapHelper.addOnFinishedLocalizingListener(result -> {
             ma.robotIsLocalized.set(result == LocalizeAndMapHelper.LocalizationStatus.LOCALIZED);
+            ma.robotHelper.releaseAbilities();
             ma.runOnUiThread(() -> {
                 if (result == LocalizeAndMapHelper.LocalizationStatus.LOCALIZED) {
                     localizedPopup.dialog.show();
                     localizedPopup.dialog.getWindow().setAttributes(localizedPopup.lp);
-                    FutureUtils.wait((long) 5, TimeUnit.SECONDS)
+                    FutureUtils.wait(5, TimeUnit.SECONDS)
                             .thenConsume(aUselessFutureB -> ma.runOnUiThread(() -> {
                                 if (currentFragment.isVisible()) {
                                     ma.setFragment(new ProductionFragment(), true);
@@ -108,7 +111,6 @@ public class LocalizeRobotFragment extends android.support.v4.app.Fragment {
                 }
             });
         });
-
         ma.startLocalizing();
     }
 

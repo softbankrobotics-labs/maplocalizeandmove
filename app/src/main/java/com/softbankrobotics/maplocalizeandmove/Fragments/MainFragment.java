@@ -2,17 +2,19 @@ package com.softbankrobotics.maplocalizeandmove.Fragments;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
 import com.softbankrobotics.maplocalizeandmove.MainActivity;
 import com.softbankrobotics.maplocalizeandmove.R;
 
-public class MainFragment extends android.support.v4.app.Fragment {
+public class MainFragment extends Fragment {
 
     private static final String TAG = "MSI_MainFragment";
     private MainActivity ma;
@@ -43,8 +45,6 @@ public class MainFragment extends android.support.v4.app.Fragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        /*view.findViewById(R.id.back_button).setOnClickListener(
-                (v) -> ma.setFragment(new MainFragment(),true));*/
         view.findViewById(R.id.button_setup_mode).setOnClickListener(
                 (v) -> ma.setFragment(new SetupFragment(), false));
         view.findViewById(R.id.button_production_mode).setOnClickListener(

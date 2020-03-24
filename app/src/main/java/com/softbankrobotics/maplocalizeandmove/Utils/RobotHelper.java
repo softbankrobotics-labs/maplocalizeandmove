@@ -43,6 +43,9 @@ public class RobotHelper {
     public void onRobotFocusLost() {
         // Remove the QiContext.
         qiContext = null;
+        if (holder != null) {
+            releaseAbilities();
+        }
         goToHelper.onRobotFocusLost();
         localizeAndMapHelper.onRobotFocusLost();
     }
@@ -55,37 +58,38 @@ public class RobotHelper {
 
     public Future<Void> holdAbilities(boolean withBackgroundMovement) {
         // Build the holder for the abilities.
-
-        if (holder != null) releaseAbilities();
-
-        if (withBackgroundMovement) {
-            holder = HolderBuilder.with(qiContext)
-                    .withAutonomousAbilities(
-                            AutonomousAbilitiesType.BACKGROUND_MOVEMENT,
-                            AutonomousAbilitiesType.BASIC_AWARENESS//,
-                            //AutonomousAbilitiesType.AUTONOMOUS_BLINKING
-                    )
-                    .build();
-        } else {
-            holder = HolderBuilder.with(qiContext)
-                    .withAutonomousAbilities(
-                            AutonomousAbilitiesType.BASIC_AWARENESS
-                    )
-                    .build();
-        }
-
-        // Hold the abilities asynchronously.
-        return holder.async().hold();
+        return releaseAbilities().thenCompose(voidFuture -> {
+            if (withBackgroundMovement) {
+                holder = HolderBuilder.with(qiContext)
+                        .withAutonomousAbilities(
+                                AutonomousAbilitiesType.BACKGROUND_MOVEMENT,
+                                AutonomousAbilitiesType.BASIC_AWARENESS//,
+                        )
+                        .build();
+            } else {
+                holder = HolderBuilder.with(qiContext)
+                        .withAutonomousAbilities(
+                                AutonomousAbilitiesType.BASIC_AWARENESS
+                        )
+                        .build();
+            }
+            Log.d(TAG, "holdAbilities: finished");
+            // Hold the abilities asynchronously.
+            return holder.async().hold();
+        });
     }
 
     public Future<Void> releaseAbilities() {
         // Release the holder asynchronously.
-        try {
-            return holder.async().release();
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (holder != null) {
+            Log.d(TAG, "releaseAbilities: finished");
+            return holder.async().release().andThenConsume(aVoid -> {
+                holder = null;
+            });
+        } else {
+            Log.d(TAG, "releaseAbilities: No holder to release");
+            return Future.of(null);
         }
-        return null;
     }
 
     public Frame getMapFrame() {

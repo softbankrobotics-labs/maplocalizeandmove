@@ -8,11 +8,12 @@ import android.content.pm.PackageManager;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Looper;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
+
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.aldebaran.qi.Future;
 import com.aldebaran.qi.sdk.QiContext;
@@ -24,7 +25,6 @@ import com.aldebaran.qi.sdk.design.activity.conversationstatus.SpeechBarDisplayS
 import com.aldebaran.qi.sdk.object.actuation.AttachedFrame;
 import com.aldebaran.qi.sdk.object.actuation.Frame;
 import com.aldebaran.qi.sdk.object.conversation.BodyLanguageOption;
-import com.aldebaran.qi.sdk.object.conversation.Say;
 import com.aldebaran.qi.sdk.object.geometry.Transform;
 import com.aldebaran.qi.sdk.object.locale.Language;
 import com.aldebaran.qi.sdk.object.locale.Locale;
@@ -33,6 +33,7 @@ import com.aldebaran.qi.sdk.util.FutureUtils;
 import com.softbankrobotics.maplocalizeandmove.Fragments.GoToFrameFragment;
 import com.softbankrobotics.maplocalizeandmove.Fragments.LoadingFragment;
 import com.softbankrobotics.maplocalizeandmove.Fragments.LocalizeAndMapFragment;
+import com.softbankrobotics.maplocalizeandmove.Fragments.LocalizeRobotFragment;
 import com.softbankrobotics.maplocalizeandmove.Fragments.MainFragment;
 import com.softbankrobotics.maplocalizeandmove.Fragments.SaveLocationsFragment;
 import com.softbankrobotics.maplocalizeandmove.Fragments.SetupFragment;
@@ -49,8 +50,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -63,8 +62,10 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
     public RobotHelper robotHelper;
     public AtomicBoolean robotIsLocalized = new AtomicBoolean(false);
     public boolean goToRandom = false;
+    public boolean goToRandomWasActivated = false;
     public boolean goToMaxSpeed = false;
     public boolean goToStraight = false;
+    private Future<Void> goToRandomFuture;
     private AtomicBoolean load_location_success = new AtomicBoolean(false);
     private SaveFileHelper saveFileHelper;
     private FragmentManager fragmentManager;
@@ -95,15 +96,38 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
         this.qiContext = qiContext;
         robotHelper.onRobotFocusGained(qiContext);
 
-        runOnUiThread(() -> setFragment(new MainFragment(), false));
+        Log.d(TAG, "onRobotFocusGained goToRandomWasActivated: " + goToRandomWasActivated);
+        if (goToRandomWasActivated) {
+            resumeGoToRandom();
+        } else {
+            runOnUiThread(() -> setFragment(new MainFragment(), false));
+        }
+    }
+
+    private void resumeGoToRandom() {
+        if (!robotIsLocalized.get()) {
+            robotHelper.localizeAndMapHelper.addOnFinishedLocalizingListener(result -> {
+                robotIsLocalized.set(result == LocalizeAndMapHelper.LocalizationStatus.LOCALIZED);
+                if (result == LocalizeAndMapHelper.LocalizationStatus.LOCALIZED) {
+                    FutureUtils.wait(10, TimeUnit.SECONDS)
+                            .thenConsume(aUselessFutureB -> {
+                                goToRandomLocation(true);
+                            });
+                }
+            });
+            if (!currentFragment.equalsIgnoreCase("LocalizeRobotFragment")) {
+                setFragment(new LocalizeRobotFragment(), false);
+            }
+        }
     }
 
     @Override
     public void onRobotFocusLost() {
         Log.d(TAG, "onRobotFocusLost: ");
         this.qiContext = null;
-        if (robotHelper.holder != null) {
-            robotHelper.releaseAbilities();
+        goToRandomWasActivated = goToRandom;
+        if (goToRandom) {
+            goToRandomLocation(false);
         }
         robotHelper.onRobotFocusLost();
     }
@@ -176,7 +200,7 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
         return null;
     }
 
-    public android.support.v4.app.Fragment getFragment() {
+    public Fragment getFragment() {
         return fragmentManager.findFragmentByTag("currentFragment");
     }
 
@@ -187,51 +211,61 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
         Log.d(TAG, "goToLocation: " + location);
         if (!askToCloseIfFlapIsOpened()) {
             say("Let's go to " + location + "!!");
-            robotHelper.holdAbilities(false);
+            robotHelper.goToHelper.checkAndCancelCurrentGoto().thenConsume(aVoid -> {
+                Looper.prepare();
+                robotHelper.holdAbilities(true);
 
-            GoToFrameFragment goToFrameFragment = (GoToFrameFragment) getFragment();
-            goToFrameFragment.createGoToPopup();
-            robotHelper.goToHelper.addOnStartedMovingListener(() -> runOnUiThread(() -> {
-                goToFrameFragment.goToPopup.dialog.show();
-                goToFrameFragment.goToPopup.dialog.getWindow().setAttributes(goToFrameFragment.goToPopup.lp);
-            }));
-            robotHelper.goToHelper.addOnFinishedMovingListener((success) -> {
-                runOnUiThread(() -> {
+                GoToFrameFragment goToFrameFragment = (GoToFrameFragment) getFragment();
+                goToFrameFragment.createGoToPopup();
+                robotHelper.goToHelper.addOnStartedMovingListener(() -> runOnUiThread(() -> {
+                    goToFrameFragment.goToPopup.dialog.show();
+                    goToFrameFragment.goToPopup.dialog.getWindow().setAttributes(goToFrameFragment.goToPopup.lp);
+                }));
+                robotHelper.goToHelper.addOnFinishedMovingListener((success) -> {
                     robotHelper.releaseAbilities();
-                    goToFrameFragment.goto_loader.setVisibility(View.GONE);
-                    if (success) {
-                        goToFrameFragment.check.setVisibility(View.VISIBLE);
-                        goToFrameFragment.goto_text.setVisibility(View.VISIBLE);
-                    } else {
-                        goToFrameFragment.cross.setVisibility(View.VISIBLE);
-                    }
+                    runOnUiThread(() -> {
+                        goToFrameFragment.goto_loader.setVisibility(View.GONE);
+                        if (success) {
+                            goToFrameFragment.check.setVisibility(View.VISIBLE);
+                            goToFrameFragment.goto_text.setVisibility(View.VISIBLE);
+                        } else {
+                            goToFrameFragment.cross.setVisibility(View.VISIBLE);
+                        }
+                    });
+                    Future<Void> futureUtils = FutureUtils.wait(6, TimeUnit.SECONDS)
+                            .thenConsume(aUselessFuture -> {
+                                runOnUiThread(() -> {
+                                    if (goToFrameFragment.goToPopup.dialog.isShowing())
+                                        goToFrameFragment.goToPopup.dialog.hide();
+                                });
+                            });
+
+                    //TODO Lines below are not working.
+                    runOnUiThread(() -> goToFrameFragment.goToPopup.dialog.setOnDismissListener(arg0 -> {
+                        Log.d(TAG, "goToLocation: before futureUtils.cancel");
+                        futureUtils.cancel(true);
+                        Log.d(TAG, "goToLocation: after futureUtils.cancel");
+                    }));
+
+                    robotHelper.goToHelper.removeOnStartedMovingListeners();
+                    robotHelper.goToHelper.removeOnFinishedMovingListeners();
                 });
-                Future<Void> futureUtils = FutureUtils.wait((long) 6, TimeUnit.SECONDS)
-                        .thenConsume(aUselessFuture -> runOnUiThread(() -> {
-                            if (goToFrameFragment.goToPopup.dialog.isShowing())
-                                goToFrameFragment.goToPopup.dialog.hide();
-                        }));
-
-                goToFrameFragment.goToPopup.dialog.setOnDismissListener(arg0 -> futureUtils.cancel(true));
-
-                robotHelper.goToHelper.removeOnStartedMovingListeners();
-                robotHelper.goToHelper.removeOnFinishedMovingListeners();
+                if (location.equalsIgnoreCase("mapFrame")) {
+                    robotHelper.goToHelper.goToMapFrame(goToStraight, goToMaxSpeed);
+                } else {
+                    // Get the FreeFrame from the saved locations.
+                    robotHelper.goToHelper.goTo(savedLocations.get(location), goToStraight, goToMaxSpeed);
+                }
             });
-            if (location.equalsIgnoreCase("mapFrame")) {
-                robotHelper.goToHelper.goToMapFrame(goToStraight, goToMaxSpeed);
-            } else {
-                // Get the FreeFrame from the saved locations.
-                robotHelper.goToHelper.goTo(savedLocations.get(location), goToStraight, goToMaxSpeed);
-            }
         }
     }
 
 
     public boolean askToCloseIfFlapIsOpened() {
-        boolean isFlapopened = robotHelper.getFlapState();
-        if (isFlapopened)
-            say("Please close my hatch then start the action you want");
-        return isFlapopened;
+        boolean isFlapOpened = robotHelper.getFlapState();
+        if (isFlapOpened)
+            say("Please close my charging flap then start the action you want");
+        return isFlapOpened;
     }
 
     /**
@@ -244,19 +278,20 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
         goToRandom = setGoToRandom;
         if (goToRandom) {
             robotHelper.goToHelper.addOnFinishedMovingListener((success) -> {
-                if (goToRandom) {
-                    FutureUtils.wait((long) 2, TimeUnit.MINUTES)
-                            .thenConsume(aUselessFuture -> {
-                                if (goToRandom) {
-                                    Looper.prepare();
-                                    goToRandomLocation(goToRandom);
-                                }
-                            });
-                }
+                goToRandomFuture = FutureUtils.wait(2, TimeUnit.MINUTES)
+                        .andThenConsume(aUselessFuture -> {
+                            Looper.prepare();
+                            goToRandomLocation(goToRandom);
+                        });
             });
             nextLocation = pickRandomLocation();
-            goToLocation(pickRandomLocation());
+            goToLocation(nextLocation);
+        } else {
+            goToRandomFuture.thenConsume(voidFuture -> Log.d(TAG, "goToRandomFuture: cancelled"));
+            goToRandomFuture.cancel(true);
+            robotHelper.goToHelper.removeOnFinishedMovingListeners();
         }
+
     }
 
     /**
@@ -295,7 +330,7 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
     public Future<Boolean> loadLocations() {
         return FutureUtils.futureOf((f) -> {
             // Read file into a temporary hashmap
-            File file = new File(getFilesDir(), "hashmap.ser");
+            File file = new File(getFilesDir(), "points.json");
             if (file.exists()) {
 
                 Map<String, Vector2theta> vectors = saveFileHelper.getLocationsFromFile(getApplicationContext());
@@ -331,38 +366,35 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
      * Save Locations to file
      */
     public void backupLocations() {
-        Executor executor = Executors.newSingleThreadExecutor();
-        executor.execute(() -> {
 
-            Map<String, Vector2theta> locationsToBackup = new HashMap<>();
-            Frame mapFrame = robotHelper.getMapFrame();
+        Map<String, Vector2theta> locationsToBackup = new HashMap<>();
+        Frame mapFrame = robotHelper.getMapFrame();
 
-            for (Map.Entry<String, AttachedFrame> entry : savedLocations.entrySet()) {
-                // get location of the frame
-                AttachedFrame destination = entry.getValue();
-                Frame frame = destination.async().frame().getValue();
+        for (Map.Entry<String, AttachedFrame> entry : savedLocations.entrySet()) {
+            // get location of the frame
+            AttachedFrame destination = entry.getValue();
+            Frame frame = destination.async().frame().getValue();
 
-                // create a serializable vector2theta
-                Vector2theta vector = Vector2theta.betweenFrames(mapFrame, frame);
+            // create a serializable vector2theta
+            Vector2theta vector = Vector2theta.betweenFrames(mapFrame, frame);
 
-                // add to backup list
-                locationsToBackup.put(entry.getKey(), vector);
-            }
+            // add to backup list
+            locationsToBackup.put(entry.getKey(), vector);
+        }
 
-            saveFileHelper.saveLocationsToFile(getApplicationContext(), locationsToBackup);
-            runOnUiThread(() -> {
-                SaveLocationsFragment saveLocationsFragment = (SaveLocationsFragment) getFragment();
-                saveLocationsFragment.progressBar.setVisibility(View.GONE);
-                saveLocationsFragment.locationsSaved.setVisibility(View.VISIBLE);
-                saveLocationsFragment.saving_text.setText("Saved");
-                saveLocationsFragment.locationsListModified = false;
-                FutureUtils.wait((long) 5, TimeUnit.SECONDS)
-                        .thenConsume(aUselessFutureB -> runOnUiThread(() -> {
-                            if (saveLocationsFragment.isVisible()) {
-                                saveLocationsFragment.savingLocationsPopup.dialog.hide();
-                            }
-                        }));
-            });
+        saveFileHelper.saveLocationsToFile(getApplicationContext(), locationsToBackup);
+        runOnUiThread(() -> {
+            SaveLocationsFragment saveLocationsFragment = (SaveLocationsFragment) getFragment();
+            saveLocationsFragment.progressBar.setVisibility(View.GONE);
+            saveLocationsFragment.locationsSaved.setVisibility(View.VISIBLE);
+            saveLocationsFragment.saving_text.setText("Saved");
+            saveLocationsFragment.locationsListModified = false;
+            FutureUtils.wait(5, TimeUnit.SECONDS)
+                    .thenConsume(aUselessFutureB -> runOnUiThread(() -> {
+                        if (saveLocationsFragment.isVisible()) {
+                            saveLocationsFragment.savingLocationsPopup.dialog.hide();
+                        }
+                    }));
         });
     }
 
@@ -370,66 +402,62 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
      * Launch the function localizeAndMap that allow the user to teach a map to Pepper.
      */
     public void startMapping() {
-        Executor executor = Executors.newSingleThreadExecutor();
-        executor.execute(() -> {
-            // 20s for the user to leave and the remaining obstacles to be forgotten by the memory
-            Log.d(TAG, "startLocalizeAndMap");
-            LocalizeAndMapFragment localizeAndMapFragment = (LocalizeAndMapFragment) getFragment();
-            robotHelper.holdAbilities(true).andThenConsume(aVoid -> robotHelper.localizeAndMapHelper.animationToLookInFront().andThenConsume(aVoid1 -> {
-                //Todo Put back 20 seconds sleep before starting the map in order to free the temporary obstacles
-                say(getString(R.string.stay_away_mapping)).andThenConsume(aVoid2 -> FutureUtils.wait((long) 5, TimeUnit.SECONDS)
-                        .thenConsume(aUselessFuture -> {
-                            robotHelper.localizeAndMapHelper.addOnFinishedMappingListener(success -> {
-                                robotHelper.releaseAbilities();
-                                if (success) {
-                                    Log.d(TAG, "stopMappingAndBackupMap: start saving map!");
-                                    String mapData = robotHelper.localizeAndMapHelper.getMap();
-                                    saveFileHelper.writeStringToFile(getApplicationContext(), mapData, "mapData.txt");
+        // 20s for the user to leave and the remaining obstacles to be forgotten by the memory
+        Log.d(TAG, "startLocalizeAndMap");
+        LocalizeAndMapFragment localizeAndMapFragment = (LocalizeAndMapFragment) getFragment();
+        robotHelper.holdAbilities(true).andThenConsume(aVoid -> robotHelper.localizeAndMapHelper.animationToLookInFront().andThenConsume(aVoid1 -> {
+            //TODO Put back 20 seconds sleep before starting the map in order to free the temporary obstacles
+            say(getString(R.string.stay_away_mapping)).andThenConsume(aVoid2 -> FutureUtils.wait(5, TimeUnit.SECONDS)
+                    .thenConsume(aUselessFuture -> {
+                        robotHelper.localizeAndMapHelper.addOnFinishedMappingListener(success -> {
+                            robotHelper.releaseAbilities();
+                            if (success) {
+                                Log.d(TAG, "stopMappingAndBackupMap: start saving map!");
+                                String mapData = robotHelper.localizeAndMapHelper.getMap();
+                                saveFileHelper.writeStringToFile(getApplicationContext(), mapData, "mapData.txt");
 
-                                    runOnUiThread(() -> {
-                                        localizeAndMapFragment.progressBar.setVisibility(View.GONE);
-                                        localizeAndMapFragment.mapSaved.setVisibility(View.VISIBLE);
-                                        localizeAndMapFragment.saving_text.setText("Saved");
-                                    });
-                                    FutureUtils.wait((long) 5, TimeUnit.SECONDS)
-                                            .thenConsume(aUselessFutureB -> runOnUiThread(() -> {
-                                                if (localizeAndMapFragment.isVisible()) {
-                                                    localizeAndMapFragment.savingMapPopup.dialog.hide();
-                                                    setFragment(new SetupFragment(), true);
-                                                }
-                                            }));
-                                    robotHelper.localizeAndMapHelper.removeOnFinishedMappingListeners();
-                                } else {
-                                    Log.d(TAG, "startMapping: finished with error");
-                                    runOnUiThread(() -> {
-                                        localizeAndMapFragment.stop_button.setVisibility(View.GONE);
-                                        localizeAndMapFragment.icn_360_load.setVisibility(View.GONE);
-                                        localizeAndMapFragment.retry.setVisibility(View.VISIBLE);
-                                        localizeAndMapFragment.mapping_error.setVisibility(View.VISIBLE);
-                                        if (localizeAndMapFragment.timer != null)
-                                            localizeAndMapFragment.timer.cancel();
-                                        if (localizeAndMapFragment.savingMapPopup != null) {
-                                            if (localizeAndMapFragment.savingMapPopup.dialog.isShowing())
-                                                localizeAndMapFragment.saving_text.setText("Saving error, please retry");
-                                            FutureUtils.wait((long) 5, TimeUnit.SECONDS)
-                                                    .thenConsume(aUselessFutureB -> runOnUiThread(() -> localizeAndMapFragment.savingMapPopup.dialog.hide()));
-                                        }
-                                    });
-                                }
-                            });
-                            robotHelper.localizeAndMapHelper.localizeAndMap();
-                            runOnUiThread(() -> localizeAndMapFragment.onIntialMappingFinished());
-                        }));
-            }));
-        });
+                                runOnUiThread(() -> {
+                                    localizeAndMapFragment.progressBar.setVisibility(View.GONE);
+                                    localizeAndMapFragment.mapSaved.setVisibility(View.VISIBLE);
+                                    localizeAndMapFragment.saving_text.setText("Saved");
+                                });
+                                FutureUtils.wait(5, TimeUnit.SECONDS)
+                                        .thenConsume(aUselessFutureB -> runOnUiThread(() -> {
+                                            if (localizeAndMapFragment.isVisible()) {
+                                                localizeAndMapFragment.savingMapPopup.dialog.hide();
+                                                setFragment(new SetupFragment(), true);
+                                            }
+                                        }));
+                                robotHelper.localizeAndMapHelper.removeOnFinishedMappingListeners();
+                            } else {
+                                Log.d(TAG, "startMapping: finished with error");
+                                runOnUiThread(() -> {
+                                    localizeAndMapFragment.stop_button.setVisibility(View.GONE);
+                                    localizeAndMapFragment.icn_360_load.setVisibility(View.GONE);
+                                    localizeAndMapFragment.retry.setVisibility(View.VISIBLE);
+                                    localizeAndMapFragment.mapping_error.setVisibility(View.VISIBLE);
+                                    if (localizeAndMapFragment.timer != null)
+                                        localizeAndMapFragment.timer.cancel();
+                                    if (localizeAndMapFragment.savingMapPopup != null) {
+                                        if (localizeAndMapFragment.savingMapPopup.dialog.isShowing())
+                                            localizeAndMapFragment.saving_text.setText("Saving error, please retry");
+                                        FutureUtils.wait(5, TimeUnit.SECONDS)
+                                                .thenConsume(aUselessFutureB -> runOnUiThread(() -> localizeAndMapFragment.savingMapPopup.dialog.hide()));
+                                    }
+                                });
+                            }
+                        });
+                        robotHelper.localizeAndMapHelper.localizeAndMap();
+                        runOnUiThread(() -> localizeAndMapFragment.onIntialMappingFinished());
+                    }));
+        }));
     }
 
     /**
      * Stop the mapping phase and save the map in file
      */
     public void stopMappingAndBackupMap() {
-        Executor executor = Executors.newSingleThreadExecutor();
-        executor.execute(() -> robotHelper.localizeAndMapHelper.stopCurrentAction().thenConsume(f -> Log.d(TAG, "stopMappingAndBackupMap: stopped")));
+        robotHelper.localizeAndMapHelper.stopCurrentAction().thenConsume(f -> Log.d(TAG, "stopMappingAndBackupMap: stopped"));
     }
 
     /**
@@ -437,27 +465,24 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
      */
     public void startLocalizing() {
         say(getString(R.string.stay_away_localizing));
-        Executor executor = Executors.newSingleThreadExecutor();
-        executor.execute(() -> {
-            if (robotHelper.localizeAndMapHelper.getMap().isEmpty()) {
-                String map = saveFileHelper.readStringFromFile(getApplicationContext(), "mapData.txt");
-                if (map.equalsIgnoreCase("File not found") || map.equalsIgnoreCase("Can not read file")) {
-                    Log.d(TAG, "startLocalizing: No Map Available");
-                    robotHelper.localizeAndMapHelper.raiseFinishedLocalizing(LocalizeAndMapHelper.LocalizationStatus.MAP_MISSING);
-                } else {
-                    Log.d(TAG, "startLocalizing: get and set map");
-                    robotHelper.localizeAndMapHelper.setMap(map);
-
-                    robotHelper.holdAbilities(true).andThenConsume((useless) ->
-                            robotHelper.localizeAndMapHelper.animationToLookInFront().andThenConsume(aVoid ->
-                            robotHelper.localizeAndMapHelper.localize()));
-                }
+        if (robotHelper.localizeAndMapHelper.getMap().isEmpty()) {
+            String map = saveFileHelper.readStringFromFile(getApplicationContext(), "mapData.txt");
+            if (map.equalsIgnoreCase("File not found") || map.equalsIgnoreCase("Can not read file")) {
+                Log.d(TAG, "startLocalizing: No Map Available");
+                robotHelper.localizeAndMapHelper.raiseFinishedLocalizing(LocalizeAndMapHelper.LocalizationStatus.MAP_MISSING);
             } else {
+                Log.d(TAG, "startLocalizing: get and set map");
+                robotHelper.localizeAndMapHelper.setMap(map);
+
                 robotHelper.holdAbilities(true).andThenConsume((useless) ->
                         robotHelper.localizeAndMapHelper.animationToLookInFront().andThenConsume(aVoid ->
-                        robotHelper.localizeAndMapHelper.localize()));
+                                robotHelper.localizeAndMapHelper.localize().andThenConsume(aVoid1 -> Log.d(TAG, "startLocalizing: Localize finished"))));
             }
-        });
+        } else {
+            robotHelper.holdAbilities(true).andThenConsume((useless) ->
+                    robotHelper.localizeAndMapHelper.animationToLookInFront().andThenConsume(aVoid ->
+                            robotHelper.localizeAndMapHelper.localize().andThenConsume(aVoid1 -> Log.d(TAG, "startLocalizing: Localize finished"))));
+        }
     }
 
     /**
@@ -474,16 +499,14 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
      * @return
      */
     public Future<Void> say(final String text) {
-        Future<Say> sayFuture = SayBuilder.with(qiContext)
+        return SayBuilder.with(qiContext)
                 .withText(text)
                 .withLocale(new Locale(Language.ENGLISH, Region.UNITED_STATES))
                 .withBodyLanguageOption(BodyLanguageOption.DISABLED)
-                .buildAsync();
-
-        return sayFuture.andThenCompose(say -> {
-            //Log.d(TAG, "Say started");
-            return say.async().run();
-        });
+                .buildAsync().andThenCompose(say -> {
+                    Log.d(TAG, "Say started");
+                    return say.async().run();
+                });
     }
 
     /**

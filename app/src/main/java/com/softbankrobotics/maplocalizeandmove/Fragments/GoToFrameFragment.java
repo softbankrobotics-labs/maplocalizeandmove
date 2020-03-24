@@ -2,7 +2,6 @@ package com.softbankrobotics.maplocalizeandmove.Fragments;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
@@ -14,17 +13,19 @@ import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
 import com.airbnb.lottie.LottieAnimationView;
 import com.aldebaran.qi.sdk.object.actuation.AttachedFrame;
 import com.softbankrobotics.maplocalizeandmove.MainActivity;
 import com.softbankrobotics.maplocalizeandmove.R;
 import com.softbankrobotics.maplocalizeandmove.Utils.Popup;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-public class GoToFrameFragment extends android.support.v4.app.Fragment {
+public class GoToFrameFragment extends Fragment {
 
     private static final String TAG = "GoToFrameFragment";
     public Popup goToPopup;
@@ -34,6 +35,8 @@ public class GoToFrameFragment extends android.support.v4.app.Fragment {
     public LottieAnimationView goto_loader;
     private MainActivity ma;
     private View localView;
+    private Button goToRandomButton;
+    private Button stopGoToRandomButton;
 
     /**
      * inflates the layout associated with this fragment
@@ -65,25 +68,24 @@ public class GoToFrameFragment extends android.support.v4.app.Fragment {
         view.findViewById(R.id.back_button).setOnClickListener((v) ->
                 ma.setFragment(new ProductionFragment(), true));
 
-        Button goToRandomButton = view.findViewById(R.id.goto_random);
-        Button stopGoToRandomButton = view.findViewById(R.id.stop_goto_random);
-        stopGoToRandomButton.setAlpha((float) 0.5);
+        goToRandomButton = view.findViewById(R.id.goto_random);
+        stopGoToRandomButton = view.findViewById(R.id.stop_goto_random);
+
+        if (ma.goToRandomWasActivated) {
+            gotoRandomButtonActivated();
+        } else {
+            stopGoToRandomButtonActivated();
+        }
 
         goToRandomButton.setOnClickListener((v) -> {
+            gotoRandomButtonActivated();
             ma.goToRandomLocation(true);
-            goToRandomButton.setEnabled(false);
-            goToRandomButton.setAlpha((float) 0.5);
-            stopGoToRandomButton.setEnabled(true);
-            stopGoToRandomButton.setAlpha(1);
 
         });
 
         stopGoToRandomButton.setOnClickListener((v) -> {
+            stopGoToRandomButtonActivated();
             ma.goToRandomLocation(false);
-            stopGoToRandomButton.setEnabled(false);
-            stopGoToRandomButton.setAlpha((float) 0.5);
-            goToRandomButton.setEnabled(true);
-            goToRandomButton.setAlpha(1);
         });
 
         Switch goToMaxSpeedSwitch = view.findViewById(R.id.gotomaxspeed);
@@ -94,6 +96,20 @@ public class GoToFrameFragment extends android.support.v4.app.Fragment {
         displayLocations();
     }
 
+    private void gotoRandomButtonActivated() {
+        goToRandomButton.setEnabled(false);
+        goToRandomButton.setAlpha((float) 0.5);
+        stopGoToRandomButton.setEnabled(true);
+        stopGoToRandomButton.setAlpha(1);
+    }
+
+    private void stopGoToRandomButtonActivated() {
+        stopGoToRandomButton.setEnabled(false);
+        stopGoToRandomButton.setAlpha((float) 0.5);
+        goToRandomButton.setEnabled(true);
+        goToRandomButton.setAlpha(1);
+    }
+
     public void createGoToPopup() {
         goToPopup = new Popup(R.layout.popup_goto, this, ma);
         goto_loader = goToPopup.inflator.findViewById(R.id.goto_loader);
@@ -101,7 +117,11 @@ public class GoToFrameFragment extends android.support.v4.app.Fragment {
         goto_text = goToPopup.inflator.findViewById(R.id.goto_text);
         cross = goToPopup.inflator.findViewById(R.id.cross);
         Button close_button = goToPopup.inflator.findViewById(R.id.close_button);
-        close_button.setOnClickListener((v) -> goToPopup.dialog.hide());
+        close_button.setOnClickListener((v) -> {
+            goToPopup.dialog.hide();
+            ma.robotHelper.goToHelper.checkAndCancelCurrentGoto();
+            Log.d(TAG, "GoToPopup: GoTo Action canceled by user");
+        });
     }
 
     private void displayLocations() {
@@ -129,7 +149,6 @@ public class GoToFrameFragment extends android.support.v4.app.Fragment {
             separationList.setImageResource(R.drawable.ic_separation_list);
             Button goToFrameButton = (Button) mapFrameLayout.getChildAt(2);
             goToFrameButton.setOnClickListener((useless) -> {
-                Log.d(TAG, "Goto Frame: MapFrame");
                 ma.goToLocation("mapFrame");
             });
             linearLayout.addView(mapFrameLayout);
@@ -137,7 +156,7 @@ public class GoToFrameFragment extends android.support.v4.app.Fragment {
 
             //Adding all locations loaded in list
             for (Map.Entry<String, AttachedFrame> stringAttachedFrameEntry : ma.savedLocations.entrySet()) {
-                Map.Entry pair = (Map.Entry) stringAttachedFrameEntry;
+                Map.Entry pair = stringAttachedFrameEntry;
                 LinearLayout v = (LinearLayout) inflater.inflate(R.layout.item_location_list_goto, null);
                 TextView locationName = (TextView) v.getChildAt(1);
                 locationName.setText(pair.getKey().toString());
@@ -145,7 +164,7 @@ public class GoToFrameFragment extends android.support.v4.app.Fragment {
                 separationListbis.setImageResource(R.drawable.ic_separation_list);
                 Button goToButton = (Button) v.getChildAt(2);
                 goToButton.setOnClickListener((useless) -> {
-                    Log.d(TAG, "Goto Frame: " + pair.getKey().toString());
+                    //Log.d(TAG, "Goto Frame: " + pair.getKey().toString());
                     ma.goToLocation(pair.getKey().toString());
                 });
                 linearLayout.addView(v);

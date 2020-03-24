@@ -5,11 +5,17 @@ import android.util.Log;
 import com.aldebaran.qi.Future;
 import com.aldebaran.qi.sdk.QiContext;
 import com.aldebaran.qi.sdk.builder.GoToBuilder;
+import com.aldebaran.qi.sdk.builder.TransformBuilder;
+import com.aldebaran.qi.sdk.object.actuation.Actuation;
 import com.aldebaran.qi.sdk.object.actuation.AttachedFrame;
 import com.aldebaran.qi.sdk.object.actuation.Frame;
+import com.aldebaran.qi.sdk.object.actuation.FreeFrame;
 import com.aldebaran.qi.sdk.object.actuation.GoTo;
+import com.aldebaran.qi.sdk.object.actuation.Mapping;
 import com.aldebaran.qi.sdk.object.actuation.OrientationPolicy;
 import com.aldebaran.qi.sdk.object.actuation.PathPlanningPolicy;
+import com.aldebaran.qi.sdk.object.geometry.Transform;
+import com.aldebaran.qi.sdk.object.geometry.Vector3;
 import com.aldebaran.qi.sdk.util.FutureUtils;
 
 import java.util.ArrayList;
@@ -36,6 +42,7 @@ public class GoToHelper {
     private int tryCounter; // Counter to remember how many times the GoTo was tried already
     private List<onStartedMovingListener> startedListeners;
     private List<onFinishedMovingListener> finishedListeners;
+    private Future<Void> currentGoToAction;
 
     /**
      * Constructor: call me in your `onCreate`
@@ -110,8 +117,14 @@ public class GoToHelper {
         raiseStartedMoving();
 
         PathPlanningPolicy pathPlanningPolicy;
-        if (goToStraight) pathPlanningPolicy = PathPlanningPolicy.STRAIGHT_LINES_ONLY;
-        else pathPlanningPolicy = PathPlanningPolicy.GET_AROUND_OBSTACLES;
+        if (goToStraight){
+            pathPlanningPolicy = PathPlanningPolicy.STRAIGHT_LINES_ONLY;
+            Log.d(TAG, "goTo: Straight");
+        }
+        else{
+            pathPlanningPolicy = PathPlanningPolicy.GET_AROUND_OBSTACLES;
+            Log.d(TAG, "goTo: Around Obstacles");
+        }
 
         float speed;
         if (goToMaxSpeed) speed = 0.55f;
@@ -134,7 +147,7 @@ public class GoToHelper {
      */
     private void tryGoTo(GoTo goToAction) {
         // This function runs the GoTo asynchronously, then checks the success.
-        goToAction.async()
+        currentGoToAction = goToAction.async()
                 .run()
                 .thenConsume(goToResult -> {
                     /*
@@ -142,7 +155,6 @@ public class GoToHelper {
                      * and we align the robot with Frame frame.
                      * In case of error, we retry up to 5 times before really giving up.
                      */
-
                     if (goToResult.isSuccess()) {
                         Log.d(TAG, "Move successful");
                         raiseFinishedMoving(true);
@@ -167,6 +179,15 @@ public class GoToHelper {
                         Log.d(TAG, "Move finished, but the robot did not reach destination.");
                     }
                 });
+    }
+
+    public Future<Void> checkAndCancelCurrentGoto() {
+        tryCounter = 0;
+        if (currentGoToAction == null) {
+            return Future.of(null);
+        }
+        currentGoToAction.cancel(true);
+        return currentGoToAction;
     }
 
     public void addOnStartedMovingListener(onStartedMovingListener f) {

@@ -42,6 +42,8 @@ public class LocalizeAndMapHelper {
     private List<onStartedMappingListener> startedMappingListeners;
     private List<onFinishedMappingListener> finishedMappingListeners;
     private Localize builtLocalize;
+    private ExplorationMap explorationMap;
+
     /**
      * Constructor: call me in your `onCreate`
      */
@@ -68,12 +70,15 @@ public class LocalizeAndMapHelper {
      */
     void onRobotFocusLost() {
         // Remove the QiContext.
-        try {
-            builtLocalize.removeAllOnStatusChangedListeners();
-        } catch (Exception e) {
-            Log.d(TAG, "onRobotFocusLost: Exception e : " + e.toString());
+        if (builtLocalize != null) {
+            try {
+                builtLocalize.removeAllOnStatusChangedListeners();
+            } catch (Exception e) {
+                Log.d(TAG, "onRobotFocusLost: Exception e : " + e.toString());
+            }
         }
         qiContext = null;
+        builtLocalize = null;
     }
 
     /**
@@ -119,38 +124,41 @@ public class LocalizeAndMapHelper {
 
         return checkAndCancelCurrentLocalize()
                 .thenApply(aUselessFuture -> {
-                    if (builtLocalize != null) {
+                    /*if (builtLocalize != null) {
                         return builtLocalize;
-                    } else {
-                        try {
-                            ExplorationMap explorationMap = ExplorationMapBuilder.with(qiContext).withMapString(currentExplorationMap).build();
-                            builtLocalize = LocalizeBuilder.with(qiContext).withMap(explorationMap).build();
-                            builtLocalize.addOnStatusChangedListener(status -> checkStatusAndRaiseLocalized(status));
-                            Log.d(TAG, "localize: localize built successfully");
-                            return builtLocalize;
-                        } catch (Exception e) {
-                            raiseFinishedLocalizing(LocalizationStatus.MAP_MISSING);
-                            return null;
+                    } else {*/
+                    try {
+                        if (explorationMap == null) {
+                            explorationMap = ExplorationMapBuilder.with(qiContext).withMapString(currentExplorationMap).build();
                         }
+                        builtLocalize = LocalizeBuilder.with(qiContext).withMap(explorationMap).build();
+                        Log.d(TAG, "localize: addOnStatusChangedListener");
+                        builtLocalize.addOnStatusChangedListener(status -> checkStatusAndRaiseLocalized(status));
+                        Log.d(TAG, "localize: localize built successfully");
+                        return builtLocalize;
+                    } catch (Exception e) {
+                        raiseFinishedLocalizing(LocalizationStatus.MAP_MISSING);
+                        return null;
                     }
+                    //}
                 })
                 .andThenCompose(localize -> {
                     builtLocalize = localize;
                     Log.d(TAG, "localize running...");
-                    //localize.addOnStatusChangedListener(status -> checkStatusAndRaiseLocalized(status));
-                    currentlyRunningLocalize = localize.async().run();
+                    currentlyRunningLocalize = builtLocalize.async().run();
                     return currentlyRunningLocalize;
                 })
                 .thenConsume(finishedLocalize -> {
+                    Log.d(TAG, "localize: removeAllOnStatusChangedListeners");
+                    builtLocalize.removeAllOnStatusChangedListeners();
                     if (finishedLocalize.isCancelled()) {
                         Log.d(TAG, "localize cancelled.");
                         raiseFinishedLocalizing(LocalizationStatus.CANCELLED);
                     } else if (finishedLocalize.hasError()) {
                         Log.d(TAG, "Failed to localize in map", finishedLocalize.getError());
                         //The error below is present in 2.9.3.114 when trying to run multiple Localize action with the same Localize object (called builtLocalize here)
-                        if (finishedLocalize.getError().toString().equals("com.aldebaran.qi.QiException: tr1::bad_weak_ptr")) {
+                        if (finishedLocalize.getError().toString().equals("com.aldebaran.qi.QiException: tr1::bad_weak_ptr") || finishedLocalize.getError().toString().equals("com.aldebaran.qi.QiException: Animation failed.")) {
                             Log.d(TAG, "localize: com.aldebaran.qi.QiException: tr1::bad_weak_ptr");
-                            builtLocalize.removeAllOnStatusChangedListeners();
                             builtLocalize = null;
                             localize().get();
                         } else raiseFinishedLocalizing(LocalizationStatus.FAILED);
@@ -226,15 +234,15 @@ public class LocalizeAndMapHelper {
      * the callback for the UI.
      */
     private void checkStatusAndRaiseLocalized(com.aldebaran.qi.sdk.object.actuation.LocalizationStatus status) {
+        Log.d(TAG, "checkStatusAndRaiseLocalized status: " + status.toString());
         if (status == com.aldebaran.qi.sdk.object.actuation.LocalizationStatus.LOCALIZED) {
             Log.d(TAG, "Robot is localized");
             raiseFinishedLocalizing(LocalizationStatus.LOCALIZED);
-            // Put back if it improves the performances.
-            //animationToLookInFront();
         }
     }
 
     public Future<Void> animationToLookInFront() {
+        Log.d(TAG, "animationToLookInFront: started");
         return AnimationBuilder.with(qiContext) // Create the builder with the context.
                 .withResources(R.raw.idle) // Set the animation resource.
                 .buildAsync().andThenCompose(animation -> AnimateBuilder.with(qiContext)
@@ -245,17 +253,6 @@ public class LocalizeAndMapHelper {
     public void addOnStartedLocalizingListener(onStartedLocalizingListener f) {
         startedLocalizingListeners.add(f);
     }
-
-    /*public Future<Void> animationToLookInFront() {
-        Animation animation = AnimationBuilder.with(qiContext) // Create the builder with the context.
-                .withResources(R.raw.idle) // Set the animation resource.
-                .buildAsync().getValue();
-
-        Animate animate = AnimateBuilder.with(qiContext)
-                .withAnimation(animation)
-                .buildAsync().getValue();
-        return animate.async().run();
-    }*/
 
     public void addOnFinishedLocalizingListener(onFinishedLocalizingListener f) {
         finishedLocalizingListeners.add(f);
@@ -293,8 +290,6 @@ public class LocalizeAndMapHelper {
 
     public void raiseFinishedLocalizing(LocalizationStatus result) {
         for (onFinishedLocalizingListener f : finishedLocalizingListeners) {
-            Log.d(TAG, "raiseFinishedLocalizing: f" + f);
-            Log.d(TAG, "raiseFinishedLocalizing: builtLocalize" + builtLocalize);
             f.onFinishedLocalizing(result);
         }
     }

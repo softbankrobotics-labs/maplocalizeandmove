@@ -2,7 +2,6 @@ package com.softbankrobotics.maplocalizeandmove.Fragments;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
@@ -13,6 +12,9 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
 import com.airbnb.lottie.LottieAnimationView;
 import com.softbankrobotics.maplocalizeandmove.MainActivity;
 import com.softbankrobotics.maplocalizeandmove.R;
@@ -21,7 +23,7 @@ import com.softbankrobotics.maplocalizeandmove.Utils.Popup;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class LocalizeAndMapFragment extends android.support.v4.app.Fragment {
+public class LocalizeAndMapFragment extends Fragment {
 
     private static final String TAG = "MSI_ScreenOneFragment";
     public ImageView mapSaved;
@@ -68,6 +70,7 @@ public class LocalizeAndMapFragment extends android.support.v4.app.Fragment {
         mapping_error = localView.findViewById(R.id.mapping_error);
         localView.findViewById(R.id.back_button).setOnClickListener((v) -> {
             if (timer != null) timer.cancel();
+            ma.robotHelper.releaseAbilities();
             ma.robotHelper.localizeAndMapHelper.removeOnFinishedMappingListeners();
             ma.robotHelper.localizeAndMapHelper.stopCurrentAction();
             ma.setFragment(new SetupFragment(), true);
