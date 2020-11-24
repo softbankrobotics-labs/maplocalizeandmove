@@ -1,67 +1,82 @@
 <resources>
     <!--app name-->
-    <string name="app_name">MapLocalizeAndMove</string>
+    <string name="app_name">MapLocalize&amp;Move</string>
 
     <!-- fragment_loading -->
     <string name="loading">Loading</string>
 
     <!-- fragment_localize_and_map -->
-    <string name="productionModeButton">PRODUCTION MODE</string>
-    <string name="setupModeButton">SETUP MODE</string>
+    <string name="production_mode_button">PRODUCTION MODE</string>
+    <string name="setup_mode_button">SETUP MODE</string>
 
     <!-- fragment_setup -->
-    <string name="setupModeFragment">Let\'s map the world</string>
-    <string name="localizeAndMap">LOCALIZE &amp; MAP</string>
+    <string name="setup_mode_fragment">Let\'s map the world</string>
+    <string name="localize_and_map">LOCALIZE &amp; MAP</string>
     <string name="localize">LOCALIZE MY ROBOT</string>
 
     <!-- fragment_production -->
-    <string name="ProductionModeFragment">Let\'s explore the world</string>
+    <string name="production_mode_fragment">Let\'s explore the world</string>
     <string name="gotoframe">Go to Frame</string>
 
 
     <!-- fragment_map_localize_and_move -->
-    <string name="LocalizeAndMapFragment">Let\'s map the room</string>
-    <string name="warning">Please stay away during initial mapping</string>
-    <string name="push">Move me around the room to map</string>
-    <string name="trap">First open the power hatch on the back</string>
-    <string name="mapping">Place me where you want me to pass</string>
-    <string name="SaveStopButton">STOP &amp; SAVE</string>
+    <string name="localize_and_map_fragment">Let\'s map the room</string>
+    <string name="warning">Please stay away during initial mapping.</string>
+    <string name="push">Move me around the room to map.</string>
+    <string name="trap">First open the Charging Flap on the back.</string>
+    <string name="mapping">Push me on the path you want to map in both directions.</string>
+    <string name="save_stop_button">STOP &amp; SAVE</string>
 
     <!-- fragment_save_locations -->
-    <string name="SaveLocationFragment">Let\'s save points of interest</string>
-    <string name="BackupLocations">Save Locations</string>
+    <string name="save_location_fragment">Let\'s save points of interest</string>
+    <string name="backup_locations">Save Locations</string>
 
     <!-- fragment_save_frame -->
-    <string name="map_position">Open my hatch then place me where you want me to pass / go</string>
-    <string name="CancelButton">Cancel</string>
-    <string name="Yes">Yes</string>
-    <string name="popupSaveAttachedFrame">Do you want to save this position?</string>
-    <string name="locationName">Position name</string>
+    <string name="map_position">Open my Charging Flap then place me where you want me to save the position.</string>
+    <string name="cancel_button">Cancel</string>
+    <string name="yes">Yes</string>
+    <string name="popup_save_attached_frame">Do you want to save this position?</string>
+    <string name="location_name">Location name</string>
 
     <!-- fragment_localize_robot -->
-    <string name="LocalizeRobotFragment">Where am I ?</string>
-    <string name="warningLocalization">Stay away during localization</string>
-    <string name="StopButton">Stop</string>
-    <string name="popupNoLocation">Sorry, no location on memory to load</string>
-    <string name="popupNoMap">Sorry, no map on memory to load.\nGo to Setup Mode and do a \"LOCALIZE &amp; MAP\" </string>
-    <string name="AddLocation">Add Location</string>
-    <string name="youAreHome">You are Home</string>
-    <string name="mapFrame">First, bring me home then close my hatch !</string>
+    <string name="localize_robot_Fragment">Where am I ?</string>
+    <string name="warning_localization">Stay away during localization</string>
+    <string name="stop_button">Stop</string>
+    <string name="popup_no_location">Sorry, no location on memory to load</string>
+    <string name="popup_no_map">Sorry, no map on memory to load.\nGo to Setup Mode and do a \"LOCALIZE &amp; MAP\" </string>
+    <string name="add_locations">Add Locations</string>
+    <string name="you_are_home">You are Home</string>
+    <string name="go_map_frame">First, bring me home then close my Charging Flap !</string>
     <string name="localizing_at_home">I need to localize</string>
-    <string name="retryLocalize">Retry to localize</string>
-    <string name="SaveLocation">\"Save Locations\"</string>
-    <string name="BackupLocationsConfirmation">Do you want to exit without saving?</string>
+    <string name="retry_localize">Retry to localize</string>
+    <string name="save_location">Save Location</string>
+    <string name="save_locations">Save Locations</string>
+    <string name="backup_locations_confirmation">Do you want to exit without saving?</string>
     <string name="retry">Retry</string>
-    <string name="Save">Save</string>
-    <string name="Saving">Saving…</string>
+    <string name="save">Save</string>
+    <string name="saved">Saved</string>
+    <string name="saving">Saving…</string>
     <string name="location_name_text">location name X here</string>
     <string name="delete">Delete</string>
     <string name="stay_away_mapping">Please stay away from me during initial mapping!</string>
     <string name="stay_away_localizing">Please stay away from me while I localize myself!</string>
-    <string name="LocationReached">Location Reached</string>
+    <string name="location_reached">Location Reached</string>
     <string name="goto_random">GoTo random</string>
     <string name="gotomaxspeed">GoToMaxSpeed\ \ \ \ </string>
     <string name="gotostraight">GoToStraight\ \ \ \ </string>
     <string name="stop_random">Stop random</string>
     <string name="multiplepointsinarow">MultiplePointsInARow\ \ \ \ \ </string>
+    <string name="goto_charge">GoTo Charge</string>
+    <string name="existing_or_new_map">Extend existing map or create a new one ?</string>
+    <string name="extend_map">Extend Map</string>
+    <string name="create_map">Create Map</string>
+    <string name="warning18a">Warning : Function not available on 1.8a robot</string>
+    <string name="goto_undock">Undock</string>
+    <string name="goto_list_loop">GoToRouteLoop</string>
+    <string name="goto_frame">GoTo</string>
+    <string name="map_frame">MapFrame</string>
+    <string name="need_to_go_to_charge">I need to go charge myself but I am not localized!</string>
+    <string name="skip">Skip</string>
+    <string name="charging_station_frame">Open my Charging Flap then place me on my Charging Station.</string>
+    <string name="stopping_mapping">Stopping Localize And Map, please stay away.</string>
 </resources>

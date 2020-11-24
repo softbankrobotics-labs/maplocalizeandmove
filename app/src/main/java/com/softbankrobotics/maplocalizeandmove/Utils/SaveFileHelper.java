@@ -1,8 +1,12 @@
 package com.softbankrobotics.maplocalizeandmove.Utils;
 
 import android.content.Context;
+import android.os.Environment;
 import android.util.Log;
 
+import com.aldebaran.qi.sdk.object.streamablebuffer.StreamableBuffer;
+import com.aldebaran.qi.sdk.object.streamablebuffer.StreamableBufferFactory;
+import com.aldebaran.qi.sdk.util.StreamableBufferUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -17,24 +21,36 @@ import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
+import java.io.RandomAccessFile;
 import java.lang.reflect.Type;
-import java.util.HashMap;
+import java.nio.ByteBuffer;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class SaveFileHelper {
 
     private static String TAG = "MSI_SaveFileHelper";
 
-    public Map<String, Vector2theta> getLocationsFromFile(Context applicationContext) {
+    /**
+     * Get the locations from file.
+     *
+     * @param filesDirectoryPath
+     * @param LocationsFileName
+     * @return the HashMap of the locations
+     */
+    public Map<String, Vector2theta> getLocationsFromFile(String filesDirectoryPath, String LocationsFileName) {
         Map<String, Vector2theta> vectors = null;
         FileInputStream fis = null;
         ObjectInputStream ois = null;
+        File f = null;
         try {
-            fis = new FileInputStream(new File(applicationContext.getFilesDir(), "points.json"));
+            f = new File(filesDirectoryPath, LocationsFileName);
+            fis = new FileInputStream(f);
             ois = new ObjectInputStream(fis);
-            String points=(String) ois.readObject();
-            Type collectionType = new TypeToken<Map<String, Vector2theta>>(){}.getType();
-            Gson gson=new Gson();
+            String points = (String) ois.readObject();
+            Type collectionType = new TypeToken<Map<String, Vector2theta>>() {
+            }.getType();
+            Gson gson = new Gson();
             vectors = gson.fromJson(points, collectionType);
 
         } catch (IOException | ClassNotFoundException e) {
@@ -54,17 +70,29 @@ public class SaveFileHelper {
         return vectors;
     }
 
-    public void saveLocationsToFile(Context applicationContext, Map<String, Vector2theta> locationsToBackup) {
+    /**
+     * Save the list of Location to file.
+     *
+     * @param filesDirectoryPath The directory where to save the Locations
+     * @param locationsFileName  The name of the file in which it saves the Locations
+     * @param locationsToBackup  Map of Locations to save
+     */
+    public void saveLocationsToFile(String filesDirectoryPath, String locationsFileName, TreeMap<String, Vector2theta> locationsToBackup) {
 
-        Gson gson=new Gson();
-        String points =gson.toJson(locationsToBackup);
+        Gson gson = new Gson();
+        String points = gson.toJson(locationsToBackup);
 
         FileOutputStream fos = null;
         ObjectOutputStream oos = null;
 
         // Backup list into a file
         try {
-            fos = new FileOutputStream(new File(applicationContext.getFilesDir(), "points.json"));
+            File fileDirectory = new File(filesDirectoryPath, "");
+            if (!fileDirectory.exists()) {
+                fileDirectory.mkdirs();
+            }
+            File file = new File(fileDirectory, locationsFileName);
+            fos = new FileOutputStream(file);
             oos = new ObjectOutputStream(fos);
             oos.writeObject(points);
             Log.d(TAG, "backupLocations: Done");
@@ -86,69 +114,85 @@ public class SaveFileHelper {
         }
     }
 
-    public void writeStringToFile(Context applicationContext, String data, String fileName) {
-        OutputStreamWriter outputStreamWriter = null;
+    /**
+     * Save the map data as StreamableBuffer in file.
+     *
+     * @param filesDirectoryPath The directory where to save the map
+     * @param fileName           The name of the file in which it saves the map
+     * @param data               The map to save
+     */
+    public void writeStreamableBufferToFile(String filesDirectoryPath, String fileName, StreamableBuffer data) {
+        FileOutputStream fos = null;
         try {
             Log.d(TAG, "writeMapDataToFile: started");
-            outputStreamWriter = new OutputStreamWriter(applicationContext.openFileOutput(fileName, Context.MODE_PRIVATE));
-            outputStreamWriter.write(data);
+
+            File fileDirectory = new File(filesDirectoryPath, "");
+            if (!fileDirectory.exists()) {
+                fileDirectory.mkdirs();
+            }
+            File file = new File(fileDirectory, fileName);
+            fos = new FileOutputStream(file);
+            StreamableBufferUtil.copyToStream(data, fos);
         } catch (IOException e) {
             Log.d("Exception", "File write failed: " + e.getMessage(), e);
         } finally {
-            try {
-                if (outputStreamWriter != null) {
-                    outputStreamWriter.close();
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-            } catch (IOException e) {
-
-                Log.e(TAG, e.getMessage(), e);
             }
         }
         Log.d(TAG, "writeMapDataToFile:  Finished");
     }
 
-    public String readStringFromFile(Context applicationContext, String fileName) {
 
-        String ret = "";
-        InputStreamReader inputStreamReader = null;
-        BufferedReader bufferedReader;
-        InputStream inputStream = null;
+    /**
+     * Get the map data as StreamableBuffer from file.
+     *
+     * @param filesDirectoryPath The directory from which to load the map
+     * @param fileName           The name of file from which to load the map
+     * @return A StreamableBuffer of map data
+     */
+    public StreamableBuffer readStreamableBufferFromFile(String filesDirectoryPath, String fileName) {
+
+        StreamableBuffer data = null;
+        File f = null;
 
         try {
-            inputStream = applicationContext.openFileInput(fileName);
+            f = new File(filesDirectoryPath, fileName);
+            if (f.length() == 0)
+                return null;
+            data = fromFile(f);
+            return data;
 
-            if (inputStream != null) {
-                inputStreamReader = new InputStreamReader(inputStream);
-                bufferedReader = new BufferedReader(inputStreamReader);
-                String receiveString = "";
-                StringBuilder stringBuilder = new StringBuilder();
-
-                while ((receiveString = bufferedReader.readLine()) != null) {
-                    stringBuilder.append(receiveString);
-                }
-
-                ret = stringBuilder.toString();
-            }
-        } catch (FileNotFoundException e) {
-            Log.d(TAG, "File not found: " + e.getMessage(), e);
-            return "File not found";
-        } catch (IOException e) {
-            Log.d(TAG, "Can not read file: " + e.getMessage(), e);
-            return "Can not read file";
-        } finally {
-            try {
-                if (inputStream != null) {
-                    inputStream.close();
-                }
-                if (inputStreamReader != null) {
-                    inputStreamReader.close();
-                }
-            } catch (IOException e) {
-                Log.e(TAG, e.getMessage(), e);
-            }
-
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return ret;
+        return null;
     }
+
+    /**
+     * Build the map data from file as StreamableBuffer.
+     *
+     * @param file The name of file from which to load the map
+     * @return A StreamableBuffer of map data
+     */
+    private StreamableBuffer fromFile(File file) {
+        return StreamableBufferFactory.fromFunction(file.length(), (offset, size) -> {
+            try (RandomAccessFile randomAccessFile = new RandomAccessFile(file, "r")) {
+                byte[] byteArray = new byte[size.intValue()];
+                randomAccessFile.seek(offset);
+                randomAccessFile.read(byteArray);
+                return ByteBuffer.wrap(byteArray);
+            } catch (FileNotFoundException e) {
+                return null;
+            } catch (IOException e) {
+                return null;
+            }
+        });
+    }
+
 
 }

@@ -4,7 +4,10 @@
     package="com.softbankrobotics.maplocalizeandmove">
 
     <uses-feature android:name="com.softbank.hardware.pepper" />
+    <!-- For starting Autonomous Recharge app -->
+    <uses-permission android:name="com.softbankrobotics.permission.AUTO_RECHARGE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <application
         android:allowBackup="true"
         android:hardwareAccelerated="false"

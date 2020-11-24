@@ -2,6 +2,7 @@ package com.softbankrobotics.maplocalizeandmove.Utils;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
 import androidx.annotation.NonNull;
 
 import com.aldebaran.qi.sdk.builder.TransformBuilder;
@@ -41,7 +42,7 @@ public class Vector2theta implements Parcelable, Serializable {
     }
 
     /**
-     * creates a Vector2theta representing the translation between two frames and angle
+     * Create a Vector2theta representing the translation between two frames and angle.
      *
      * @param frameOrigin      the origin of the translation
      * @param frameDestination the end of the translation
@@ -61,9 +62,9 @@ public class Vector2theta implements Parcelable, Serializable {
     }
 
     /**
-     * Returns a transform representing the translation described by this Vector2theta
+     * Return a Transform representing the translation described by this Vector2theta.
      *
-     * @return the transform
+     * @return the Transform
      */
     public Transform createTransform() {
         // this.theta is the radian angle to appy taht was serialized

@@ -24,6 +24,7 @@
         android:textAllCaps="false"
         android:textSize="30sp"
         android:textStyle="bold"
+        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -33,9 +34,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-
+        android:visibility="visible"
         android:gravity="center"
-        android:text="@string/mapFrame"
+        android:text="@string/go_map_frame"
         android:textColor="@color/black"
         android:textSize="30sp"
         android:textStyle="bold"
@@ -46,10 +47,10 @@
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/dot_follow_one"
-        android:layout_width="154dp"
+        android:layout_width="198dp"
         android:layout_height="22dp"
         android:layout_marginTop="30dp"
-
+        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/map_frame_text">
@@ -76,6 +77,12 @@
             android:layout_height="22dp"
             android:layout_marginStart="22dp"
             android:background="@drawable/ic_dot_outline" />
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_marginStart="22dp"
+            android:background="@drawable/ic_dot_outline" />
     </androidx.appcompat.widget.LinearLayoutCompat>
 
     <Button
@@ -84,10 +91,10 @@
         android:layout_height="63dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="80dp"
-
+        android:visibility="visible"
         android:background="@drawable/ic_btn_save_down"
         android:fontFamily="@font/verdanab"
-        android:text="@string/youAreHome"
+        android:text="@string/you_are_home"
         android:textAllCaps="false"
         android:textColor="@color/white"
         android:textSize="30sp"
@@ -158,7 +165,7 @@
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/dot_follow_two"
-        android:layout_width="154dp"
+        android:layout_width="198dp"
         android:layout_height="22dp"
         android:layout_marginTop="30dp"
         android:visibility="gone"
@@ -188,6 +195,12 @@
             android:layout_height="22dp"
             android:layout_marginStart="22dp"
             android:background="@drawable/ic_dot_outline" />
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_marginStart="22dp"
+            android:background="@drawable/ic_dot_outline" />
     </androidx.appcompat.widget.LinearLayoutCompat>
 
     <Button
@@ -198,7 +211,7 @@
         android:layout_marginTop="80dp"
         android:background="@drawable/ic_btn_save_down"
         android:fontFamily="@font/verdanab"
-        android:text="@string/retryLocalize"
+        android:text="@string/retry_localize"
         android:textAllCaps="false"
         android:textColor="@color/white"
         android:textSize="30sp"
@@ -207,6 +220,112 @@
         app:layout_constraintEnd_toEndOf="@+id/localizing_text"
         app:layout_constraintStart_toStartOf="@+id/localizing_text"
         app:layout_constraintTop_toBottomOf="@+id/localizing_text" />
+
+    <ImageView
+        android:id="@+id/charging_station_image"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_margin="10dp"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/charging_sation"
+        android:textAllCaps="false"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/charging_station_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="8dp"
+        android:gravity="center"
+        android:text="@string/charging_station_frame"
+        android:textColor="@color/black"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@+id/charging_station_image"
+        app:layout_constraintHorizontal_bias="0.407"
+        app:layout_constraintStart_toStartOf="@+id/charging_station_image"
+        app:layout_constraintTop_toBottomOf="@+id/charging_station_image" />
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/dot_follow_three"
+        android:layout_width="198dp"
+        android:layout_height="22dp"
+        android:layout_marginTop="30dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/charging_station_text">
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:background="@drawable/ic_dot_outline" />
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_marginStart="22dp"
+            android:background="@drawable/ic_dot_outline" />
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_marginStart="22dp"
+            android:background="@drawable/ic_dot_full" />
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_marginStart="22dp"
+            android:background="@drawable/ic_dot_outline" />
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_marginStart="22dp"
+            android:background="@drawable/ic_dot_outline" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <Button
+        android:id="@+id/button_save_charging_station"
+        android:layout_width="300dp"
+        android:layout_height="63dp"
+        android:layout_marginTop="80dp"
+        android:background="@drawable/ic_btn_save_down"
+        android:fontFamily="@font/verdanab"
+        android:text="@string/save"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintEnd_toStartOf="@+id/dot_follow_three"
+
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/charging_station_text" />
+
+    <Button
+        android:id="@+id/button_skip_charging_station"
+        android:layout_width="300dp"
+        android:layout_height="63dp"
+        android:layout_marginTop="80dp"
+        android:background="@drawable/ic_btn_save_down"
+        android:fontFamily="@font/verdanab"
+        android:text="@string/skip"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/dot_follow_three"
+        app:layout_constraintTop_toBottomOf="@+id/charging_station_text" />
 
     <ImageView
         android:id="@+id/map_position"
@@ -242,8 +361,8 @@
         app:layout_constraintTop_toBottomOf="@+id/map_position" />
 
     <androidx.appcompat.widget.LinearLayoutCompat
-        android:id="@+id/dot_follow_three"
-        android:layout_width="154dp"
+        android:id="@+id/dot_follow_four"
+        android:layout_width="198dp"
         android:layout_height="22dp"
         android:layout_marginTop="30dp"
         android:visibility="gone"
@@ -254,6 +373,12 @@
         <ImageView
             android:layout_width="22dp"
             android:layout_height="22dp"
+            android:background="@drawable/ic_dot_outline" />
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_marginStart="22dp"
             android:background="@drawable/ic_dot_outline" />
 
         <ImageView
@@ -283,7 +408,7 @@
         android:layout_marginTop="80dp"
         android:background="@drawable/ic_btn_save_down"
         android:fontFamily="@font/verdanab"
-        android:text="@string/SaveStopButton"
+        android:text="@string/save_location"
         android:textAllCaps="false"
         android:textColor="@color/white"
         android:textSize="30sp"
@@ -299,7 +424,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
         android:fontFamily="@font/verdanab"
-        android:text="@string/popupSaveAttachedFrame"
+        android:text="@string/popup_save_attached_frame"
         android:textSize="25sp"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
@@ -324,7 +449,7 @@
         android:layout_height="63dp"
         android:layout_marginStart="80dp"
         android:layout_marginTop="10dp"
-        android:hint="@string/locationName"
+        android:hint="@string/location_name"
         android:inputType="textNoSuggestions"
         android:privateImeOptions="nm|IME_ACTION_DONE"
         android:textAlignment="center"
@@ -342,7 +467,7 @@
         android:fontFamily="@font/verdanab"
         android:gravity="center"
         android:paddingBottom="3dp"
-        android:text="@string/Save"
+        android:text="@string/save"
         android:textAllCaps="false"
         android:textColor="@color/white"
         android:textSize="25sp"
@@ -353,10 +478,9 @@
         app:layout_constraintTop_toTopOf="@+id/position_name"
         app:layout_constraintVertical_bias="0.941" />
 
-
     <androidx.appcompat.widget.LinearLayoutCompat
-        android:id="@+id/dot_follow_four"
-        android:layout_width="154dp"
+        android:id="@+id/dot_follow_five"
+        android:layout_width="198dp"
         android:layout_height="22dp"
         android:layout_marginTop="30dp"
         android:visibility="gone"
@@ -367,6 +491,12 @@
         <ImageView
             android:layout_width="22dp"
             android:layout_height="22dp"
+            android:background="@drawable/ic_dot_outline" />
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_marginStart="22dp"
             android:background="@drawable/ic_dot_outline" />
 
         <ImageView

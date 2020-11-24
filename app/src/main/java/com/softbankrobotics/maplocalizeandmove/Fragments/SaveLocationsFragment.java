@@ -3,8 +3,10 @@ package com.softbankrobotics.maplocalizeandmove.Fragments;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.os.Bundle;
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.LinearLayoutCompat;
+
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
@@ -43,6 +45,11 @@ public class SaveLocationsFragment extends Fragment {
     private View localView;
     private AlertDialog tutorialPopupDialog;
 
+    private ImageView charging_station_image;
+    private TextView charging_station_text;
+    private Button button_save_charging_station;
+    private Button button_skip_charging_station;
+
     private ImageView map_position;
     private TextView map_position_text;
     private Button button_stop_save;
@@ -55,6 +62,7 @@ public class SaveLocationsFragment extends Fragment {
     private LinearLayoutCompat dot_follow_two;
     private LinearLayoutCompat dot_follow_three;
     private LinearLayoutCompat dot_follow_four;
+    private LinearLayoutCompat dot_follow_five;
 
     private ImageView localizing_at_home;
     private LottieAnimationView localizing_at_homeBis;
@@ -65,8 +73,8 @@ public class SaveLocationsFragment extends Fragment {
     private boolean saveMultiplePointsInARow = false;
 
     /**
-     * inflates the layout associated with this fragment
-     * if an application theme is set it will be applied to this fragment.
+     * Inflates the layout associated with this fragment
+     * If an application theme is set, it will be applied to this fragment.
      */
 
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
@@ -113,6 +121,10 @@ public class SaveLocationsFragment extends Fragment {
         displayLocations();
     }
 
+    /**
+     * If the locations list has been modified (location added or removed) and the user tries to
+     * leave the screen without saving, a popup will be displayed to confirm its choice.
+     */
     private void displayPopupConfirmation() {
         Popup displayPopup = new Popup(R.layout.popup_backup_locations_confirmation, this, ma);
 
@@ -137,20 +149,30 @@ public class SaveLocationsFragment extends Fragment {
         });
 
 
+        // Screen #1
         ImageView mapframe_position = tutorialPopup.inflator.findViewById(R.id.mapframe_position);
         TextView map_frame_text = tutorialPopup.inflator.findViewById(R.id.map_frame_text);
         Button button_at_home = tutorialPopup.inflator.findViewById(R.id.button_at_home);
 
+        // Screen #2
         localizing_at_home = tutorialPopup.inflator.findViewById(R.id.localizing_at_home);
         localizing_at_homeBis = tutorialPopup.inflator.findViewById(R.id.localizing_at_homeBis);
         localizing_text = tutorialPopup.inflator.findViewById(R.id.localizing_text);
         button_retry = tutorialPopup.inflator.findViewById(R.id.button_retry);
         ImageView localizing_error = tutorialPopup.inflator.findViewById(R.id.localizing_error);
 
+        // Screen #3
+        charging_station_image = tutorialPopup.inflator.findViewById(R.id.charging_station_image);
+        charging_station_text = tutorialPopup.inflator.findViewById(R.id.charging_station_text);
+        button_save_charging_station = tutorialPopup.inflator.findViewById(R.id.button_save_charging_station);
+        button_skip_charging_station = tutorialPopup.inflator.findViewById(R.id.button_skip_charging_station);
+
+        // Screen #4
         map_position = tutorialPopup.inflator.findViewById(R.id.map_position);
         map_position_text = tutorialPopup.inflator.findViewById(R.id.map_position_text);
         button_stop_save = tutorialPopup.inflator.findViewById(R.id.button_stop_save);
 
+        // Screen #5
         position_name = tutorialPopup.inflator.findViewById(R.id.position_name);
         save_position_text = tutorialPopup.inflator.findViewById(R.id.save_position_text);
         save_position_image = tutorialPopup.inflator.findViewById(R.id.save_position_image);
@@ -160,10 +182,11 @@ public class SaveLocationsFragment extends Fragment {
         dot_follow_two = tutorialPopup.inflator.findViewById(R.id.dot_follow_two);
         dot_follow_three = tutorialPopup.inflator.findViewById(R.id.dot_follow_three);
         dot_follow_four = tutorialPopup.inflator.findViewById(R.id.dot_follow_four);
+        dot_follow_five = tutorialPopup.inflator.findViewById(R.id.dot_follow_five);
 
 
         button_at_home.setOnClickListener(uselessV -> {
-            if (!ma.askToCloseIfFlapIsOpened()) {
+            if (!ma.robotHelper.askToCloseIfFlapIsOpened()) {
                 mapframe_position.setVisibility(View.GONE);
                 map_frame_text.setVisibility(View.GONE);
                 button_at_home.setVisibility(View.GONE);
@@ -178,8 +201,7 @@ public class SaveLocationsFragment extends Fragment {
                     ma.robotIsLocalized.set(result == LocalizeAndMapHelper.LocalizationStatus.LOCALIZED);
                     ma.runOnUiThread(() -> {
                         if (result == LocalizeAndMapHelper.LocalizationStatus.LOCALIZED) {
-                            display3rdStep();
-
+                            display3rdStepChargingStation();
                             ma.robotHelper.localizeAndMapHelper.removeOnFinishedLocalizingListeners();
                         } else if (result == LocalizeAndMapHelper.LocalizationStatus.MAP_MISSING) {
                             noMapToLoad();
@@ -202,13 +224,17 @@ public class SaveLocationsFragment extends Fragment {
             }
         });
 
-        stopAndSavePointOfInterest();
+        display5thStepSavePointOfInterest();
 
         tutorialPopup.dialog.show();
         tutorialPopup.dialog.getWindow().setAttributes(tutorialPopup.lp);
     }
 
-    private void display3rdStep() {
+
+    /**
+     * Ask the user to save the Charging Station location.
+     */
+    private void display3rdStepChargingStation() {
         ma.robotHelper.localizeAndMapHelper.animationToLookInFront().andThenConsume(aVoid -> {
             ma.runOnUiThread(() -> {
                 localizing_at_home.setVisibility(View.GONE);
@@ -217,31 +243,66 @@ public class SaveLocationsFragment extends Fragment {
                 button_retry.setVisibility(View.GONE);
                 dot_follow_two.setVisibility(View.GONE);
 
-                map_position.setVisibility(View.VISIBLE);
-                map_position_text.setVisibility(View.VISIBLE);
-                button_stop_save.setVisibility(View.VISIBLE);
-                dot_follow_three.setVisibility(View.VISIBLE);
+                if (!ma.savedLocations.containsKey("ChargingStation")) {
+                    charging_station_image.setVisibility(View.VISIBLE);
+                    charging_station_text.setVisibility(View.VISIBLE);
+                    button_save_charging_station.setVisibility(View.VISIBLE);
+                    button_skip_charging_station.setVisibility(View.VISIBLE);
+                    dot_follow_three.setVisibility(View.VISIBLE);
+
+                    button_save_charging_station.setOnClickListener(v -> {
+                        ma.saveLocation("ChargingStation").andThenConsume(voidFuture -> {
+                            Log.d(TAG, "popupTutorialSaveAttachedFrame: Charging Station Frame saved");
+                            locationsListModified = true;
+                            display4thStep();
+                        });
+                    });
+
+                    button_skip_charging_station.setOnClickListener(v -> {
+                        display4thStep();
+                    });
+                } else display4thStep();
             });
         });
     }
 
-    private void stopAndSavePointOfInterest() {
+    private void display4thStep() {
+        ma.robotHelper.localizeAndMapHelper.animationToLookInFront().andThenConsume(aVoid -> {
+            ma.runOnUiThread(() -> {
+                charging_station_image.setVisibility(View.GONE);
+                charging_station_text.setVisibility(View.GONE);
+                button_save_charging_station.setVisibility(View.GONE);
+                button_skip_charging_station.setVisibility(View.GONE);
+                dot_follow_three.setVisibility(View.GONE);
+
+                map_position.setVisibility(View.VISIBLE);
+                map_position_text.setVisibility(View.VISIBLE);
+                button_stop_save.setVisibility(View.VISIBLE);
+                dot_follow_four.setVisibility(View.VISIBLE);
+            });
+        });
+    }
+
+
+    /**
+     * Ask the user to save a location.
+     */
+    private void display5thStepSavePointOfInterest() {
         button_stop_save.setOnClickListener((v) -> {
             map_position.setVisibility(View.GONE);
             map_position_text.setVisibility(View.GONE);
             button_stop_save.setVisibility(View.GONE);
-            dot_follow_three.setVisibility(View.GONE);
+            dot_follow_four.setVisibility(View.GONE);
 
             position_name.setVisibility(View.VISIBLE);
             save_position_text.setVisibility(View.VISIBLE);
             save_position_image.setVisibility(View.VISIBLE);
             button_yes.setVisibility(View.VISIBLE);
-            dot_follow_four.setVisibility(View.VISIBLE);
+            dot_follow_five.setVisibility(View.VISIBLE);
 
-            tutorialPopup.inflator.findViewById(R.id.button_yes).setOnClickListener((w) -> {
+            button_yes.setOnClickListener((w) -> {
                 if (!position_name.getText().toString().equalsIgnoreCase("")) {
                     ma.saveLocation(position_name.getText().toString()).andThenConsume(voidFuture -> {
-                        Log.d(TAG, "popupTutorialSaveAttachedFrame: ButtonSave");
                         ma.runOnUiThread(() -> {
                             locationsListModified = true;
                             position_name.setText("");
@@ -251,13 +312,13 @@ public class SaveLocationsFragment extends Fragment {
                                 save_position_text.setVisibility(View.GONE);
                                 save_position_image.setVisibility(View.GONE);
                                 button_yes.setVisibility(View.GONE);
-                                dot_follow_four.setVisibility(View.GONE);
-                                display3rdStep();
+                                dot_follow_five.setVisibility(View.GONE);
+                                display4thStep();
                                 try {
                                     InputMethodManager inputManager =
                                             (InputMethodManager) ma.getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                                     inputManager.hideSoftInputFromWindow(
-                                            tutorialPopup.inflator.findViewById(R.id.button_yes).getWindowToken(),
+                                            button_yes.getWindowToken(),
                                             InputMethodManager.HIDE_NOT_ALWAYS);
                                 } catch (Exception e) {
                                     e.printStackTrace();
@@ -274,6 +335,10 @@ public class SaveLocationsFragment extends Fragment {
         });
     }
 
+
+    /**
+     * Display the locations saved in memory.
+     */
     private void displayLocations() {
         Log.d(TAG, "displayLocations: started");
         if (ma.savedLocations.isEmpty()) {
@@ -315,6 +380,9 @@ public class SaveLocationsFragment extends Fragment {
         Log.d(TAG, "displayLocations: finished");
     }
 
+    /**
+     * If there is no location to load, display a popup to inform the user.
+     */
     private void noLocationsToLoad() {
         Popup noLocationsPopup = new Popup(R.layout.popup_no_locations_to_load, this, ma);
         Button close = noLocationsPopup.inflator.findViewById(R.id.close_button);
@@ -322,6 +390,9 @@ public class SaveLocationsFragment extends Fragment {
         noLocationsPopup.dialog.show();
     }
 
+    /**
+     * If there is no map to load from memory, display a popup to inform the user.
+     */
     private void noMapToLoad() {
         tutorialPopupDialog.hide();
         Popup noMapPopup = new Popup(R.layout.popup_no_map_to_load, this, ma);

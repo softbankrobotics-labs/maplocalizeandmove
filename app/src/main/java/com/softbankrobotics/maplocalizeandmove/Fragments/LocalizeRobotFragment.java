@@ -29,8 +29,8 @@ public class LocalizeRobotFragment extends Fragment {
     private Popup localizedPopup;
 
     /**
-     * inflates the layout associated with this fragment
-     * if an application theme is set it will be applied to this fragment.
+     * Inflates the layout associated with this fragment
+     * If an application theme is set, it will be applied to this fragment.
      */
 
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
@@ -55,8 +55,8 @@ public class LocalizeRobotFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         LocalizeRobotFragment currentFragment = (LocalizeRobotFragment) ma.getFragment();
-        Button back_buton = view.findViewById(R.id.back_button);
-        back_buton.setOnClickListener((v) -> {
+        Button back_button = view.findViewById(R.id.back_button);
+        back_button.setOnClickListener((v) -> {
             ma.stopLocalizing();
             ma.setFragment(new ProductionFragment(), true);
             ma.robotHelper.localizeAndMapHelper.removeOnFinishedLocalizingListeners();
@@ -73,7 +73,7 @@ public class LocalizeRobotFragment extends Fragment {
         Button close_button = localizedPopup.inflator.findViewById(R.id.close_button);
         close_button.setOnClickListener((v) -> {
             localizedPopup.dialog.hide();
-            ma.setFragment(new ProductionFragment(), true);
+            ma.setFragment(new GoToFrameFragment(), false);
         });
 
         ma.robotHelper.localizeAndMapHelper.addOnFinishedLocalizingListener(result -> {
@@ -83,10 +83,10 @@ public class LocalizeRobotFragment extends Fragment {
                 if (result == LocalizeAndMapHelper.LocalizationStatus.LOCALIZED) {
                     localizedPopup.dialog.show();
                     localizedPopup.dialog.getWindow().setAttributes(localizedPopup.lp);
-                    FutureUtils.wait(5, TimeUnit.SECONDS)
+                    FutureUtils.wait(4, TimeUnit.SECONDS)
                             .thenConsume(aUselessFutureB -> ma.runOnUiThread(() -> {
                                 if (currentFragment.isVisible()) {
-                                    ma.setFragment(new ProductionFragment(), true);
+                                    ma.setFragment(new GoToFrameFragment(), false);
                                     localizedPopup.dialog.hide();
                                 }
                             }));
@@ -114,6 +114,10 @@ public class LocalizeRobotFragment extends Fragment {
         ma.startLocalizing();
     }
 
+
+    /**
+     * If there is no map to load from memory, display a popup to inform the user.
+     */
     private void noMapToLoad() {
         Popup noMapToLoad = new Popup(R.layout.popup_no_map_to_load, this, ma);
         Button close = noMapToLoad.inflator.findViewById(R.id.close_button);

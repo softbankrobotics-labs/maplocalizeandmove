@@ -9,7 +9,7 @@
         android:layout_marginTop="15dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/ProductionModeFragment"
+        android:text="@string/production_mode_fragment"
         android:textColor="@color/black"
         android:fontFamily="@font/verdanab"
         android:textSize="40sp"
@@ -84,5 +84,21 @@
         android:background="@drawable/ic_btn_back"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/goto_undock"
+        android:layout_width="230dp"
+        android:layout_height="42dp"
+        android:background="@drawable/ic_btn_goto"
+        android:enabled="true"
+        android:paddingStart="40dp"
+        android:paddingEnd="15dp"
+        android:text="@string/goto_undock"
+        android:textColor="@android:color/white"
+        android:textSize="25sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/goToFrame"
+        app:layout_constraintStart_toStartOf="@+id/goToFrame"
+        app:layout_constraintTop_toBottomOf="@+id/goToFrame" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

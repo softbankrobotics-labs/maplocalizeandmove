@@ -1,7 +1,9 @@
 package com.softbankrobotics.maplocalizeandmove.Utils;
 
 import android.app.AlertDialog;
+
 import androidx.fragment.app.Fragment;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
@@ -33,7 +35,6 @@ public class Popup {
     }
 
     private void setSystemUiVisibilityMode() {
-
         int options;
         options = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION

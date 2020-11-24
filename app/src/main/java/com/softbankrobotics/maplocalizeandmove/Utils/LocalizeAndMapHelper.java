@@ -1,5 +1,7 @@
 package com.softbankrobotics.maplocalizeandmove.Utils;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import com.aldebaran.qi.Future;
@@ -12,6 +14,8 @@ import com.aldebaran.qi.sdk.builder.LocalizeBuilder;
 import com.aldebaran.qi.sdk.object.actuation.ExplorationMap;
 import com.aldebaran.qi.sdk.object.actuation.Localize;
 import com.aldebaran.qi.sdk.object.actuation.LocalizeAndMap;
+import com.aldebaran.qi.sdk.object.image.EncodedImage;
+import com.aldebaran.qi.sdk.object.streamablebuffer.StreamableBuffer;
 import com.softbankrobotics.maplocalizeandmove.R;
 
 import java.util.ArrayList;
@@ -33,16 +37,17 @@ import java.util.List;
 public class LocalizeAndMapHelper {
 
     private static final String TAG = "MSILocalizeAndMapHelper";
+    public ExplorationMap explorationMap;
     private QiContext qiContext; // The QiContext provided by the QiSDK.
     private Future<Void> currentlyRunningLocalize;
     private LocalizeAndMap currentLocalizeAndMap;
-    private String currentExplorationMap;
+    private String currentExplorationMapData;
+    private StreamableBuffer streamableExplorationMap;
     private List<onStartedLocalizingListener> startedLocalizingListeners;
     private List<onFinishedLocalizingListener> finishedLocalizingListeners;
     private List<onStartedMappingListener> startedMappingListeners;
     private List<onFinishedMappingListener> finishedMappingListeners;
     private Localize builtLocalize;
-    private ExplorationMap explorationMap;
 
     /**
      * Constructor: call me in your `onCreate`
@@ -52,7 +57,8 @@ public class LocalizeAndMapHelper {
         finishedLocalizingListeners = new ArrayList<>();
         startedMappingListeners = new ArrayList<>();
         finishedMappingListeners = new ArrayList<>();
-        currentExplorationMap = "";
+        currentExplorationMapData = "";
+        streamableExplorationMap = null;
         builtLocalize = null;
     }
 
@@ -63,59 +69,54 @@ public class LocalizeAndMapHelper {
      */
     void onRobotFocusGained(QiContext qc) {
         qiContext = qc;
+        builtLocalize = null;
     }
 
     /**
      * Call me in your `onRobotFocusLost`
      */
     void onRobotFocusLost() {
+        stopCurrentAction();
         // Remove the QiContext.
-        if (builtLocalize != null) {
-            try {
-                builtLocalize.removeAllOnStatusChangedListeners();
-            } catch (Exception e) {
-                Log.d(TAG, "onRobotFocusLost: Exception e : " + e.toString());
-            }
-        }
         qiContext = null;
-        builtLocalize = null;
-    }
-
-    /**
-     * Dump and extract the current map from the current mapping.
-     *
-     * @return the map as a String, for you to backup into a file.
-     */
-    public String getMap() {
-        return currentExplorationMap;
     }
 
     /**
      * Force-feed the map in case you saved it into a file.
      *
-     * @param map the map you previously saved from `getMap`
+     * @param map the map you previously saved from `getStreamableMap`
      */
-    public void setMap(String map) {
+    public void setStreamableMap(StreamableBuffer map) {
         builtLocalize = null;
-        currentExplorationMap = map;
+        streamableExplorationMap = map;
     }
 
     /**
-     * checks if a previous localize or localizeAndMap was running and cancels it. This is
-     * for making sure you don't run both at the same time (not possible on Pepper)
+     * Get the current map.
+     *
+     * @return the map as a StreamableBuffer, for you to backup into a file.
+     */
+    public StreamableBuffer getStreamableMap() {
+        return streamableExplorationMap;
+    }
+
+    /**
+     * Checks if a previous localize or localizeAndMap was running and cancel it. This is to
+     * make sure you don't run both at the same time (not possible on Pepper).
      *
      * @return Future that will complete when the action is cancelled.
      */
     private Future<Void> checkAndCancelCurrentLocalize() {
         if (currentlyRunningLocalize == null) return Future.of(null);
         currentlyRunningLocalize.requestCancellation();
+        Log.d(TAG, "checkAndCancelCurrentLocalize");
         return currentlyRunningLocalize;
     }
 
     /**
-     * start localizing: the robot will look around and try to find out where it is.<br/>
-     * <strong>important:</strong> your need to load a Map before being able to localize, so don't
-     * forget to call setMap or run a localizeAndMap.
+     * Start localizing: the robot will look around and will try to find out where it is.<br/>
+     * <strong>Important:</strong> your need to load a Map before being able to localize, so don't
+     * forget to call setStreamableMap or run a localizeAndMap.
      *
      * @return Future that will complete when you stop localize
      */
@@ -123,67 +124,74 @@ public class LocalizeAndMapHelper {
         raiseStartedLocalizing();
 
         return checkAndCancelCurrentLocalize()
-                .thenApply(aUselessFuture -> {
-                    /*if (builtLocalize != null) {
-                        return builtLocalize;
-                    } else {*/
-                    try {
-                        if (explorationMap == null) {
-                            explorationMap = ExplorationMapBuilder.with(qiContext).withMapString(currentExplorationMap).build();
-                        }
-                        builtLocalize = LocalizeBuilder.with(qiContext).withMap(explorationMap).build();
-                        Log.d(TAG, "localize: addOnStatusChangedListener");
-                        builtLocalize.addOnStatusChangedListener(status -> checkStatusAndRaiseLocalized(status));
-                        Log.d(TAG, "localize: localize built successfully");
-                        return builtLocalize;
-                    } catch (Exception e) {
-                        raiseFinishedLocalizing(LocalizationStatus.MAP_MISSING);
-                        return null;
-                    }
-                    //}
-                })
-                .andThenCompose(localize -> {
-                    builtLocalize = localize;
-                    Log.d(TAG, "localize running...");
-                    currentlyRunningLocalize = builtLocalize.async().run();
-                    return currentlyRunningLocalize;
-                })
-                .thenConsume(finishedLocalize -> {
-                    Log.d(TAG, "localize: removeAllOnStatusChangedListeners");
-                    builtLocalize.removeAllOnStatusChangedListeners();
-                    if (finishedLocalize.isCancelled()) {
-                        Log.d(TAG, "localize cancelled.");
-                        raiseFinishedLocalizing(LocalizationStatus.CANCELLED);
-                    } else if (finishedLocalize.hasError()) {
-                        Log.d(TAG, "Failed to localize in map", finishedLocalize.getError());
-                        //The error below is present in 2.9.3.114 when trying to run multiple Localize action with the same Localize object (called builtLocalize here)
-                        if (finishedLocalize.getError().toString().equals("com.aldebaran.qi.QiException: tr1::bad_weak_ptr") || finishedLocalize.getError().toString().equals("com.aldebaran.qi.QiException: Animation failed.")) {
-                            Log.d(TAG, "localize: com.aldebaran.qi.QiException: tr1::bad_weak_ptr");
-                            builtLocalize = null;
-                            localize().get();
-                        } else raiseFinishedLocalizing(LocalizationStatus.FAILED);
-                    } else {
-                        Log.d(TAG, "localize finished.");
-                        raiseFinishedLocalizing(LocalizationStatus.FINISHED);
-                    }
+                .thenConsume(aUselessFuture -> {
+                    buildStreamableExplorationMap().andThenConsume(value -> {
+                        explorationMap = value;
+                        LocalizeBuilder.with(qiContext).withMap(explorationMap).buildAsync()
+                                .andThenCompose(localize -> {
+                                    builtLocalize = localize;
+                                    Log.d(TAG, "localize: localize built successfully");
+                                    Log.d(TAG, "localize: addOnStatusChangedListener");
+                                    builtLocalize.addOnStatusChangedListener(status -> checkStatusAndRaiseLocalized(status));
+                                    currentlyRunningLocalize = builtLocalize.async().run();
+                                    Log.d(TAG, "localize running...");
+                                    return currentlyRunningLocalize;
+                                })
+                                .thenConsume(finishedLocalize -> {
+                                    Log.d(TAG, "localize: removeAllOnStatusChangedListeners");
+                                    builtLocalize.removeAllOnStatusChangedListeners();
+                                    if (finishedLocalize.isCancelled()) {
+                                        Log.d(TAG, "localize cancelled.");
+                                        raiseFinishedLocalizing(LocalizationStatus.CANCELLED);
+                                    } else if (finishedLocalize.hasError()) {
+                                        Log.d(TAG, "Failed to localize in map : ", finishedLocalize.getError());
+                                        //The error below could happen when trying to run multiple Localize action with the same Localize object (called builtLocalize here).
+                                        if (finishedLocalize.getError().toString().equals("com.aldebaran.qi.QiException: tr1::bad_weak_ptr") || finishedLocalize.getError().toString().equals("com.aldebaran.qi.QiException: Animation failed.")) {
+                                            Log.d(TAG, "localize: com.aldebaran.qi.QiException: tr1::bad_weak_ptr");
+                                            builtLocalize = null;
+                                            localize().get();
+                                        } else raiseFinishedLocalizing(LocalizationStatus.FAILED);
+                                    } else {
+                                        Log.d(TAG, "localize finished.");
+                                        raiseFinishedLocalizing(LocalizationStatus.FINISHED);
+                                    }
+                                });
+                    });
                 });
     }
 
+
     /**
-     * start localizeAndMap: the robot will record its current position and continue mapping its
-     * environment. In this mode, any obstacle, such as a human on the way, will be counted as an
-     * definitive obstacle in the map, same as a wall.
+     * Build the ExplorationMap from a StreamableBuffer.
+     *
+     * @return the future of the ExplorationMap
+     */
+    public Future<ExplorationMap> buildStreamableExplorationMap() {
+        if (explorationMap == null) {
+            Log.d(TAG, "buildStreamableExplorationMap: Building map from StreamableBuffer");
+            return ExplorationMapBuilder.with(qiContext).withStreamableBuffer(streamableExplorationMap).buildAsync();
+        }
+        return Future.of(explorationMap);
+    }
+
+    /**
+     * Start localizeAndMap: the robot will record its current position and continue mapping its
+     * environment. In this mode, any obstacle, such as a human on the way, will be counted as a
+     * definitive obstacle in the map, similarly as a wall.
      * <br/>
-     * Use this mode to push the robot around to make it learn its environment. Make sure to well
-     * stay behind the robot.
+     * Use this mode to push the robot around to make it learn its environment. Make sure to stay
+     * behind the robot.
      *
      * @return Future that will complete when you stop localizeAndMap
      */
-    public Future<Void> localizeAndMap() {
+    public Future<Void> localizeAndMap(boolean withExistingMap) {
         raiseStartedMapping();
         return checkAndCancelCurrentLocalize()
-                .thenCompose(aUselessVoid -> LocalizeAndMapBuilder.with(qiContext).buildAsync())
-                .andThenCompose(localizeAndMap -> {
+                .thenCompose(aUselessVoid -> {
+                    if (withExistingMap) {
+                        return LocalizeAndMapBuilder.with(qiContext).withMap(explorationMap).buildAsync();
+                    } else return LocalizeAndMapBuilder.with(qiContext).buildAsync();
+                }).andThenCompose(localizeAndMap -> {
                     Log.d(TAG, "localizeAndMap built successfully, running...");
                     localizeAndMap.addOnStatusChangedListener(status -> checkStatusAndRaiseLocalized(status));
                     currentLocalizeAndMap = localizeAndMap;
@@ -199,7 +207,11 @@ public class LocalizeAndMapHelper {
 
                         try {
                             currentLocalizeAndMap.async().dumpMap()
-                                    .andThenConsume(dumpedMap -> setMap(dumpedMap.serialize()))
+                                    .andThenConsume(dumpedMap -> {
+                                        explorationMap = dumpedMap;
+                                        setStreamableMap(dumpedMap.serializeAsStreamableBuffer());
+
+                                    })
                                     .thenConsume(f -> {
                                         if (f.hasError()) {
                                             Log.w(TAG, "map dump finished with error: ", f.getError());
@@ -230,8 +242,8 @@ public class LocalizeAndMapHelper {
     }
 
     /**
-     * Callback for localize status changes. When the status is "localized" then it raises
-     * the callback for the UI.
+     * Callback for localize status changes. When the status is "localized", it will raise the
+     * callback for the UI.
      */
     private void checkStatusAndRaiseLocalized(com.aldebaran.qi.sdk.object.actuation.LocalizationStatus status) {
         Log.d(TAG, "checkStatusAndRaiseLocalized status: " + status.toString());
@@ -248,6 +260,24 @@ public class LocalizeAndMapHelper {
                 .buildAsync().andThenCompose(animation -> AnimateBuilder.with(qiContext)
                         .withAnimation(animation)
                         .buildAsync().andThenCompose(animate -> animate.async().run()));
+    }
+
+
+    /**
+     * This function will build the ExplorationMap from a StreamableBuffer and then get a visual
+     * representation of it.
+     *
+     * @return the Future of a Bitmap
+     */
+    public Future<Bitmap> getExplorationMapBitmap() {
+        return buildStreamableExplorationMap().andThenConsume(value -> explorationMap = value)
+                .thenCompose(uselessFuture -> explorationMap.async().getTopGraphicalRepresentation().andThenCompose(mapGraphicalRepresentation -> {
+                    EncodedImage encodedImage = mapGraphicalRepresentation.getImage();
+                    byte[] decodedString = encodedImage.getData().array();
+                    final BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inMutable = true;
+                    return Future.of(BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length, options));
+                }));
     }
 
     public void addOnStartedLocalizingListener(onStartedLocalizingListener f) {
@@ -315,7 +345,7 @@ public class LocalizeAndMapHelper {
     }
 
     /**
-     * Little helper for the UI to subscribe to the current state of localize/map
+     * Little helper for the UI to subscribe to the current state of localize/map.
      * This has nothing to do with the robot, but is for helping in the MainActivity to enable
      * or disable functions during an action.
      */

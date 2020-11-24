@@ -45,7 +45,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="440dp"
         android:fontFamily="@font/verdanab"
-        android:text="@string/LocationReached"
+        android:text="@string/location_reached"
         android:textSize="25sp"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"

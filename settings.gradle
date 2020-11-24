@@ -1,1 +1,2 @@
+include ':autonomousrecharge'
 include ':app'

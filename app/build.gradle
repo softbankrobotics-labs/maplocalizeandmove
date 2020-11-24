@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
     defaultConfig {
         applicationId "com.softbankrobotics.maplocalizeandmove"
         minSdkVersion 23
-        targetSdkVersion 29
-        versionCode 124
-        versionName "1.2.4"
+        targetSdkVersion 30
+        versionCode 140
+        versionName "1.4.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         setProperty("archivesBaseName", "maplocalizeandmove-$versionName")
     }
@@ -33,9 +33,9 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
     implementation('com.airbnb.android:lottie:2.7.0') {
         exclude group: 'com.android.support', module: 'support-v7'
         exclude group: 'com.android.support', module: 'support-v4'
@@ -43,12 +43,17 @@ dependencies {
         exclude group: 'com.android.support', module: 'recyclerview'
         exclude group: 'com.android.support', module: 'transition'
     }
+    // Gson
     implementation 'com.google.code.gson:gson:2.8.6'
 
-    implementation 'com.aldebaran:qisdk:1.6.7'
-    implementation 'com.aldebaran:qisdk-design:1.6.7'
+    // Kotlin
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
-    implementation 'com.google.code.gson:gson:2.8.6'
+    // QiSDK
+    implementation 'com.aldebaran:qisdk:1.7.5'
+    implementation 'com.aldebaran:qisdk-design:1.7.5'
+    implementation project(path: ':autonomousrecharge')
+
 }
 repositories {
     mavenCentral()

@@ -25,13 +25,24 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageView
+        android:id="@+id/display_map"
+        android:layout_width="800dp"
+        android:layout_height="500dp"
+        android:layout_marginTop="50dp"
+        android:background="@drawable/ic_icn_save_frames_ok"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/saving_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="440dp"
         android:fontFamily="@font/verdanab"
-        android:text="@string/Saving"
+        android:text="@string/stopping_mapping"
         android:textSize="25sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -44,6 +55,7 @@
         android:layout_marginTop="15dp"
         android:layout_marginEnd="15dp"
         android:background="@drawable/ic_btn_close"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

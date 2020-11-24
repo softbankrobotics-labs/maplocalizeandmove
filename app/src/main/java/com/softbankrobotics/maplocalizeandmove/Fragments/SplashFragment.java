@@ -2,7 +2,9 @@ package com.softbankrobotics.maplocalizeandmove.Fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+
 import androidx.annotation.Nullable;
+
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
@@ -20,8 +22,8 @@ public class SplashFragment extends Fragment {
     private MainActivity ma;
 
     /**
-     * inflates the layout associated with this fragment
-     * if an application theme is set it will be applied to this fragment.
+     * Inflates the layout associated with this fragment
+     * If an application theme is set, it will be applied to this fragment.
      */
 
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,

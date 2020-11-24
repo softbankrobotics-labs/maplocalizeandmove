@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/display_map"
+        android:layout_width="450dp"
+        android:layout_height="450dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ProgressBar
+        android:id="@+id/progressbar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="450dp"
+        android:layout_height="450dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_icn_save_frames" />
+
+    <TextView
+        android:id="@+id/existing_or_new_map"
+        android:layout_width="430dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:fontFamily="@font/verdanab"
+        android:text="@string/existing_or_new_map"
+        android:textSize="25sp"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toBottomOf="@+id/display_map"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/display_map" />
+
+    <Button
+        android:id="@+id/extend_map"
+        android:layout_width="289dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="100dp"
+        android:background="@drawable/ic_btn_save_up"
+        android:fontFamily="@font/verdanab"
+        android:paddingBottom="3dp"
+        android:text="@string/extend_map"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        android:clickable="false"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/display_map" />
+
+    <TextView
+        android:id="@+id/warning_18a"
+        android:layout_width="470dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/verdanab"
+        android:text="@string/warning18a"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="@+id/extend_map"
+
+        app:layout_constraintStart_toStartOf="@+id/extend_map"
+        app:layout_constraintTop_toBottomOf="@+id/extend_map" />
+
+    <Button
+        android:id="@+id/create_map"
+        android:layout_width="289dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="100dp"
+        android:background="@drawable/ic_btn_add_full"
+        android:fontFamily="@font/verdanab"
+        android:gravity="center"
+        android:paddingBottom="3dp"
+        android:text="@string/create_map"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/extend_map"
+        app:layout_constraintEnd_toEndOf="@+id/existing_or_new_map"
+        app:layout_constraintTop_toTopOf="@+id/extend_map"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <Button
+        android:id="@+id/close_button"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="15dp"
+        android:background="@drawable/ic_btn_close"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -9,7 +9,7 @@ class NavUtils {
     private static final String TAG = "MSI_MapLocalizeAndMove";
 
     /**
-     * Gets the "yaw" (or "theta") angle from a quaternion (the only angle relevant for navigation)
+     * Get the "yaw" (or "theta") angle from a quaternion (the only angle relevant for navigation).
      */
     static double getYawFromQuaternion(Quaternion q) {
         // yaw (z-axis rotation)

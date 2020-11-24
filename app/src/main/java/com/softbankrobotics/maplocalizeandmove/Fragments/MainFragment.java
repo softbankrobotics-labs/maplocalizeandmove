@@ -20,8 +20,8 @@ public class MainFragment extends Fragment {
     private MainActivity ma;
 
     /**
-     * inflates the layout associated with this fragment
-     * if an application theme is set it will be applied to this fragment.
+     * Inflates the layout associated with this fragment
+     * If an application theme is set, it will be applied to this fragment.
      */
 
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
