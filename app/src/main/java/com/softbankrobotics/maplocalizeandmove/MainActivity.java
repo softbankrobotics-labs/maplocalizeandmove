@@ -88,6 +88,7 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
     private BroadcastReceiver batteryLevelReceiver;
     private GoToFrameFragment goToFrameFragment;
     private String currentFragment;
+    public QiContext qiContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,6 +141,7 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
     @Override
     public void onRobotFocusGained(QiContext qiContext) {
         Log.d(TAG, "onRobotFocusedGained");
+        this.qiContext = qiContext;
         robotHelper.onRobotFocusGained(qiContext);
 
         AutonomousRecharge.registerReceiver(qiContext);

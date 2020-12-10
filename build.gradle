@@ -3,7 +3,7 @@
 buildscript {
 
     // Kotlin
-    ext.kotlin_version = '1.4.10'
+    ext.kotlin_version = '1.4.20'
 
     // QiSDK
     ext.qisdk_group_id = 'com.aldebaran'
@@ -27,6 +27,7 @@ allprojects {
         google()
         jcenter()
     	maven { url 'https://qisdk.softbankrobotics.com/sdk/maven' }
+        maven { url 'https://jitpack.io' }
     }
 }
 

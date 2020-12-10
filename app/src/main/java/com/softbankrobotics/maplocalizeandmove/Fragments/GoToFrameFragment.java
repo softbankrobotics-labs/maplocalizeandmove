@@ -1,8 +1,8 @@
 package com.softbankrobotics.maplocalizeandmove.Fragments;
 
 import android.content.Context;
+import android.graphics.PointF;
 import android.os.Bundle;
-import android.os.Looper;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
@@ -21,13 +21,15 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.airbnb.lottie.LottieAnimationView;
-import com.aldebaran.qi.Future;
 import com.aldebaran.qi.sdk.object.actuation.AttachedFrame;
+import com.aldebaran.qi.sdk.object.actuation.Frame;
 import com.aldebaran.qi.sdk.object.actuation.OrientationPolicy;
+import com.aldebaran.qi.sdk.object.geometry.Transform;
 import com.aldebaran.qi.sdk.util.FutureUtils;
 import com.softbankrobotics.maplocalizeandmove.MainActivity;
 import com.softbankrobotics.maplocalizeandmove.R;
 import com.softbankrobotics.maplocalizeandmove.Utils.GoToHelper;
+import com.softbankrobotics.maplocalizeandmove.Utils.PointsOfInterestView;
 import com.softbankrobotics.maplocalizeandmove.Utils.Popup;
 
 import org.jetbrains.annotations.NotNull;
@@ -35,9 +37,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class GoToFrameFragment extends Fragment {
@@ -45,9 +47,10 @@ public class GoToFrameFragment extends Fragment {
     private static final String TAG = "MSI_GoToFrameFragment";
     public Popup goToPopup = null;
     public ImageView check;
-    public TextView goto_text;
+    public TextView goto_finished_text;
     public ImageView cross;
     public LottieAnimationView goto_loader;
+    private TextView goto_text;
     private MainActivity ma;
     private View localView;
     private Button goToRandomButton;
@@ -57,6 +60,9 @@ public class GoToFrameFragment extends Fragment {
     private int gotoRouteCounter = 0;
     private boolean goToRouteSuccess = false;
     private boolean goToRouteLoop = false;
+    private Frame robotFrame;
+    private Frame mapFrame;
+    private List<PointF> poiPositions = null;
 
     /**
      * Inflates the layout associated with this fragment.
@@ -186,6 +192,7 @@ public class GoToFrameFragment extends Fragment {
             goto_loader = goToPopup.inflator.findViewById(R.id.goto_loader);
             check = goToPopup.inflator.findViewById(R.id.check);
             goto_text = goToPopup.inflator.findViewById(R.id.goto_text);
+            goto_finished_text = goToPopup.inflator.findViewById(R.id.goto_finished_text);
             cross = goToPopup.inflator.findViewById(R.id.cross);
             close_button = goToPopup.inflator.findViewById(R.id.close_button);
             close_button.setOnClickListener((v) -> {
@@ -193,11 +200,43 @@ public class GoToFrameFragment extends Fragment {
                 ma.robotHelper.goToHelper.checkAndCancelCurrentGoto();
                 Log.d(TAG, "GoToPopup: GoTo Action canceled by user");
             });
+
+            // Retrieve the robot Frame
+            robotFrame = (ma.qiContext.getActuationAsync()).getValue().async().robotFrame().getValue();
+
+            // Retrieve the origin of the map Frame
+            mapFrame = (ma.qiContext.getMappingAsync()).getValue().async().mapFrame().getValue();
+
+            PointsOfInterestView explorationMapView = goToPopup.inflator.findViewById(R.id.explorationMapViewPopup);
+
+            ma.robotHelper.localizeAndMapHelper.buildStreamableExplorationMap().andThenConsume(value -> {
+                poiPositions = new ArrayList<>(ma.savedLocations.size() + 1);
+                for (Map.Entry<String, AttachedFrame> stringAttachedFrameEntry : ma.savedLocations.entrySet()) {
+                    Transform transform = (((stringAttachedFrameEntry.getValue()).async().frame()).getValue().async().computeTransform(mapFrame)).getValue().getTransform();
+                    poiPositions.add(new PointF(((float) transform.getTranslation().getX()), (float) transform.getTranslation().getY()));
+                    //Log.d(TAG, "createGoToPopup: transform: "+(((stringAttachedFrameEntry.getValue()).async().frame()).getValue().async().computeTransform(mapFrame)).getValue().getTransform().getTranslation().toString());
+                }
+                explorationMapView.setExplorationMap(value.getTopGraphicalRepresentation());
+                explorationMapView.setMapFramPosition();
+                explorationMapView.setPoiPositions(poiPositions);
+            }).andThenConsume(value -> {
+                int delay = 0;
+                int period = 500;  // repeat every sec.
+                Timer timer = new Timer();
+                timer.scheduleAtFixedRate(new TimerTask() {
+                    public void run() {
+                        // Compute the position of the robot relatively to the map Frame
+                        Transform robotPos = robotFrame.computeTransform(mapFrame).getTransform();
+                        // Set the position in the ExplorationMapView widget, it will be displayed as a red circle
+                        explorationMapView.setRobotPosition(robotPos);
+                    }
+                }, delay, period);
+            });
         } else {
             ma.runOnUiThread(() -> {
                 cross.setVisibility(View.GONE);
                 check.setVisibility(View.GONE);
-                goto_text.setVisibility(View.GONE);
+                goto_finished_text.setVisibility(View.GONE);
                 goto_loader.setVisibility(View.VISIBLE);
                 close_button.setVisibility(View.VISIBLE);
             });
@@ -209,11 +248,13 @@ public class GoToFrameFragment extends Fragment {
      * Go to the requested Location.
      * If it successfully ends the goTo, and if the Location is ChargingStation, it will
      * start the docking process.
+     *
      * @param location
      * @param orientationPolicy
      */
     public void goToLocation(String location, OrientationPolicy orientationPolicy) {
         createGoToPopup();
+        ma.runOnUiThread(() ->goto_text.setText("Let's go to " + location + " !"));
         ma.robotHelper.goToHelper.addOnStartedMovingListener(() -> ma.runOnUiThread(() -> {
             goToPopup.dialog.show();
             goToPopup.dialog.getWindow().setAttributes(goToPopup.lp);
@@ -238,7 +279,7 @@ public class GoToFrameFragment extends Fragment {
                     close_button.setVisibility(View.GONE);
                     if (goToStatus == GoToHelper.GoToStatus.FINISHED) {
                         check.setVisibility(View.VISIBLE);
-                        goto_text.setVisibility(View.VISIBLE);
+                        goto_finished_text.setVisibility(View.VISIBLE);
                     } else {
                         cross.setVisibility(View.VISIBLE);
                     }
@@ -296,6 +337,7 @@ public class GoToFrameFragment extends Fragment {
         if (ma.locationsToGoTo.size() != 0) {
             goToRouteSuccess = false;
             createGoToPopup();
+            ma.runOnUiThread(() -> goto_text.setText("Let's go to " + ma.locationsToGoTo.get(gotoRouteCounter) + " !"));
             ma.robotHelper.goToHelper.addOnStartedMovingListener(() -> ma.runOnUiThread(() -> {
                 goToPopup.dialog.show();
                 goToPopup.dialog.getWindow().setAttributes(goToPopup.lp);
@@ -307,6 +349,7 @@ public class GoToFrameFragment extends Fragment {
                 Log.d(TAG, "goToRoute : " + goToStatus);
                 gotoRouteCounter++;
                 if (goToStatus == GoToHelper.GoToStatus.FINISHED && gotoRouteCounter < ma.locationsToGoTo.size()) {
+                    ma.runOnUiThread(() -> goto_text.setText("Let's go to " + ma.locationsToGoTo.get(gotoRouteCounter) + " !"));
                     if (gotoRouteCounter == ma.locationsToGoTo.size() - 1) {
                         ma.goToLocation(ma.locationsToGoTo.get(gotoRouteCounter), OrientationPolicy.ALIGN_X);
                     } else {
@@ -331,7 +374,7 @@ public class GoToFrameFragment extends Fragment {
                             if (goToStatus == GoToHelper.GoToStatus.FINISHED) {
                                 Log.d(TAG, "goToRoute: ended with success");
                                 check.setVisibility(View.VISIBLE);
-                                goto_text.setVisibility(View.VISIBLE);
+                                goto_finished_text.setVisibility(View.VISIBLE);
                                 goToRouteSuccess = true;
                             } else {
                                 Log.d(TAG, "goToRoute: failed to complete route");

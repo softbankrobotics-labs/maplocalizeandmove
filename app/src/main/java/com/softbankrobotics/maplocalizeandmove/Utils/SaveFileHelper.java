@@ -1,7 +1,5 @@
 package com.softbankrobotics.maplocalizeandmove.Utils;
 
-import android.content.Context;
-import android.os.Environment;
 import android.util.Log;
 
 import com.aldebaran.qi.sdk.object.streamablebuffer.StreamableBuffer;
@@ -10,17 +8,13 @@ import com.aldebaran.qi.sdk.util.StreamableBufferUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStreamWriter;
 import java.io.RandomAccessFile;
 import java.lang.reflect.Type;
 import java.nio.ByteBuffer;

@@ -1,5 +1,5 @@
 # MapLocalizeAndMove
-**Article and code updated on 17/11/2020**
+**Article and code updated on 10/12/2020**
 
 Navigation tutorial for Pepper running on Android.
 
@@ -17,7 +17,7 @@ Creating a navigation use case needs to be done in 2 steps: Setup-time, when the
 
 ### Setup time
 
-During setup, you need to teach your robot the map of the room(s) it will have to navigate in, as well as all the points of interest in this room. This is done manually, pushing the robot around the room to show it the path it is able to drive through. The goal is to create an [ExplorationMap](https://qisdk.softbankrobotics.com/sdk/doc/qisdk/index.html?com/aldebaran/qi/sdk/object/actuation/ExplorationMap.html) object.
+During setup, you need to teach your robot the map of the room(s) it will have to navigate in, as well as all the points of interest in this room. This is done manually, pushing the robot around the room to show it the path it is able to drive through. The goal is to create an [ExplorationMap](https://developer.softbankrobotics.com/pepper-qisdk/api/motion/reference/explorationmap) object.
 
 #### 1) Mapping the environment
 
@@ -279,7 +279,7 @@ public void saveLocationsToFile(String filesDirectoryPath, String locationsFileN
 
 ##### 1.1) Place the robot at its MapFrame (base location)
 
-First, with the **Charging Flap** open, move the robot to a position close to the base position you defined [earlier](https://partner-portal.aldebaran.com/projects/knowledge-base/wiki/Navigation_using_the_qisdk#1-Mapping-the-environment). Using [Localize](https://developer.softbankrobotics.com/pepper-qisdk/api/motion/reference/localize the robot will use its lasers and its cameras to look around for known features in its environment. It is theoretically able to locate itself anywhere (Only with 1.8 robot since API 6)  within the [ExplorationMap](https://developer.softbankrobotics.com/pepper-qisdk/api/motion/reference/explorationmap) you created during setup, but for consistent performances we recommend that you start close to the base location(MapFrame).
+First, with the **Charging Flap** open, move the robot to a position close to the base position you defined [earlier](https://partner-portal.aldebaran.com/projects/knowledge-base/wiki/Navigation_using_the_qisdk#1-Mapping-the-environment). Using [Localize](https://developer.softbankrobotics.com/pepper-qisdk/api/motion/reference/localize) the robot will use its lasers and its cameras to look around for known features in its environment. It is theoretically able to locate itself anywhere (Only with 1.8 robot since API 6)  within the [ExplorationMap](https://developer.softbankrobotics.com/pepper-qisdk/api/motion/reference/explorationmap) you created during setup, but for consistent performances we recommend that you start close to the base location(MapFrame).
 
 ##### 1.2) Let the robot locate itself
 
@@ -297,7 +297,7 @@ Localize localize = LocalizeBuilder.with(qiContext)
 localize.async().run();
 </code></pre>
 
-+Note:+ If you need, the robot can also readjust automatically and go to its precise base location with a simple [GoTo](https://developer.softbankrobotics.com/pepper-qisdk/api/motion/reference/goto action):
++Note:+ If you need, the robot can also readjust automatically and go to its precise base location with a simple [GoTo](https://developer.softbankrobotics.com/pepper-qisdk/api/motion/reference/goto) action:
 <pre><code class="java">
 // Add a listener to get the map when localized.
 localize.addOnStatusChangedListener(localizationStatus -> {
