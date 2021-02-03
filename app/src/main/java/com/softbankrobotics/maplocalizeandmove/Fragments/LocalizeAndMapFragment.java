@@ -16,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.aldebaran.qi.Future;
 import com.aldebaran.qi.sdk.object.streamablebuffer.StreamableBuffer;
 import com.softbankrobotics.maplocalizeandmove.MainActivity;
 import com.softbankrobotics.maplocalizeandmove.R;
@@ -31,6 +32,7 @@ public class LocalizeAndMapFragment extends Fragment {
     public ImageView mapSaved;
     public ImageView displayMap;
     public Button stop_button;
+    public Button button_full_turn;
     public Button retry;
     public TextView saving_text;
     public ImageView mapping_error;
@@ -46,6 +48,7 @@ public class LocalizeAndMapFragment extends Fragment {
     int slideNumber = 1;
     private MainActivity ma;
     private View localView;
+    private Future<Void> animationFuture = null;
 
 
     /**
@@ -67,7 +70,7 @@ public class LocalizeAndMapFragment extends Fragment {
                 return inflater.inflate(fragmentId, container, false);
             }
         } else {
-            Log.e(TAG, "could not get mainActivity, can't create fragment");
+            Log.d(TAG, "could not get mainActivity, can't create fragment");
             return null;
         }
     }
@@ -82,6 +85,7 @@ public class LocalizeAndMapFragment extends Fragment {
             ma.robotHelper.localizeAndMapHelper.removeOnFinishedMappingListeners();
             ma.robotHelper.localizeAndMapHelper.removeOnFinishedLocalizingListeners();
             ma.robotHelper.localizeAndMapHelper.stopCurrentAction();
+            if (animationFuture != null) animationFuture.requestCancellation();
             ma.setFragment(new SetupFragment(), true);
         });
         stop_button = localView.findViewById(R.id.button_stop_save);
@@ -90,6 +94,14 @@ public class LocalizeAndMapFragment extends Fragment {
             savingMapPopup();
             ma.stopMappingAndBackupMap();
             ma.robotIsLocalized.set(false);
+        });
+
+        button_full_turn = localView.findViewById(R.id.button_full_turn);
+        button_full_turn.setOnClickListener((v) -> {
+            button_full_turn.setEnabled(false);
+            ma.robotHelper.say("Please stay away from me during full turn");
+            animationFuture = ma.robotHelper.localizeAndMapHelper.animationToLookAround();
+            animationFuture.thenConsume(value -> ma.runOnUiThread(()->button_full_turn.setEnabled(true)));
         });
 
         retry = localView.findViewById(R.id.button_retry);
@@ -208,6 +220,7 @@ public class LocalizeAndMapFragment extends Fragment {
 
                 ma.runOnUiThread(() -> {
                     stop_button.setVisibility(View.VISIBLE);
+                    button_full_turn.setVisibility(View.VISIBLE);
                     icn_360_load.setVisibility(View.GONE);
                     ic_360_map.setVisibility(View.GONE);
                     warning.setVisibility(View.GONE);

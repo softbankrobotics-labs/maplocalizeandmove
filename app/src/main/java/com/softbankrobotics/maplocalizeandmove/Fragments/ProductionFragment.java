@@ -43,7 +43,7 @@ public class ProductionFragment extends Fragment {
                 return inflater.inflate(fragmentId, container, false);
             }
         } else {
-            Log.e(TAG, "could not get mainActivity, can't create fragment");
+            Log.d(TAG, "could not get mainActivity, can't create fragment");
             return null;
         }
     }
@@ -83,7 +83,7 @@ public class ProductionFragment extends Fragment {
                 ma.undockFromChargingStation();
             } else {
                 ma.robotHelper.say("I can't undock from ChargingStation as I am not docked");
-                Log.d(TAG, "Can't undock from ChargingStation as not docked");
+                Log.d(TAG, "Can't undock from ChargingStation as not docked & no ChargingStation frame saved");
             }
         });
 

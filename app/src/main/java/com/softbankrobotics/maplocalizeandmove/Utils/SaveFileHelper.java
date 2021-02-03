@@ -128,7 +128,7 @@ public class SaveFileHelper {
             fos = new FileOutputStream(file);
             StreamableBufferUtil.copyToStream(data, fos);
         } catch (IOException e) {
-            Log.d("Exception", "File write failed: " + e.getMessage(), e);
+            Log.e("Exception", "File write failed: " + e.getMessage(), e);
         } finally {
             if (fos != null) {
                 try {

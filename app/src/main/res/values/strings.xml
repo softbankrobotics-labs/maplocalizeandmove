@@ -80,4 +80,5 @@
     <string name="charging_station_frame">Open my Charging Flap then place me on my Charging Station.</string>
     <string name="stopping_mapping">Stopping Localize And Map, please stay away.</string>
     <string name="goto_text">Let\'s go !</string>
+    <string name="button_full_turn">Full Turn</string>
 </resources>

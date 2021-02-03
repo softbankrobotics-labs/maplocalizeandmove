@@ -253,6 +253,10 @@ public class LocalizeAndMapHelper {
         }
     }
 
+    /**
+     * Make Pepper look in front of itself before mapping or saving Points of interest.
+     * @return Animation Future
+     */
     public Future<Void> animationToLookInFront() {
         Log.d(TAG, "animationToLookInFront: started");
         return AnimationBuilder.with(qiContext) // Create the builder with the context.
@@ -262,6 +266,18 @@ public class LocalizeAndMapHelper {
                         .buildAsync().andThenCompose(animate -> animate.async().run()));
     }
 
+    /**
+     * Make Pepper do a 360° turn, stopping for 2 seconds every 45°.
+     * @return Animation Future
+     */
+    public Future<Void> animationToLookAround() {
+        Log.d(TAG, "animationToLookAround: started");
+        return AnimationBuilder.with(qiContext) // Create the builder with the context.
+                .withResources(R.raw.full_turn_with_stop) // Set the animation resource.
+                .buildAsync().andThenCompose(animation -> AnimateBuilder.with(qiContext)
+                        .withAnimation(animation)
+                        .buildAsync().andThenCompose(animate -> animate.async().run()));
+    }
 
     /**
      * This function will build the ExplorationMap from a StreamableBuffer and then get a visual

@@ -41,7 +41,6 @@
         android:textSize="30sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="@+id/mapframe_position"
-        app:layout_constraintHorizontal_bias="0.407"
         app:layout_constraintStart_toStartOf="@+id/mapframe_position"
         app:layout_constraintTop_toBottomOf="@+id/mapframe_position" />
 
@@ -159,7 +158,6 @@
         android:textStyle="bold"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="@+id/localizing_at_home"
-        app:layout_constraintHorizontal_bias="0.407"
         app:layout_constraintStart_toStartOf="@+id/localizing_at_home"
         app:layout_constraintTop_toBottomOf="@+id/localizing_at_home" />
 
@@ -249,7 +247,6 @@
         android:textStyle="bold"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="@+id/charging_station_image"
-        app:layout_constraintHorizontal_bias="0.407"
         app:layout_constraintStart_toStartOf="@+id/charging_station_image"
         app:layout_constraintTop_toBottomOf="@+id/charging_station_image" />
 
@@ -356,7 +353,6 @@
         android:textStyle="bold"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="@+id/map_position"
-        app:layout_constraintHorizontal_bias="0.407"
         app:layout_constraintStart_toStartOf="@+id/map_position"
         app:layout_constraintTop_toBottomOf="@+id/map_position" />
 
@@ -428,7 +424,6 @@
         android:textSize="25sp"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

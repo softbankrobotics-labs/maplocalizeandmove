@@ -92,7 +92,6 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, "onCreate: started");
         super.onCreate(savedInstanceState);
         this.fragmentManager = getSupportFragmentManager();
         setSpeechBarDisplayStrategy(SpeechBarDisplayStrategy.OVERLAY);
@@ -108,7 +107,6 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
         } else {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, RECHARGE_PERMISSION}, MULTIPLE_PERMISSIONS);
         }
-        Log.d(TAG, "onCreate: finished");
     }
 
     /**
@@ -197,11 +195,10 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
 
     @Override
     protected void onResume() {
-        Log.d(TAG, "onResume: started");
+        Log.d(TAG, "onResume");
         super.onResume();
         this.setFragment(new LoadingFragment(), false);
         checkBatteryLevel();
-        Log.d(TAG, "onResume: finished");
     }
 
     /**

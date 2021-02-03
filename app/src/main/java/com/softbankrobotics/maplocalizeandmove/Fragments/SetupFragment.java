@@ -41,7 +41,7 @@ public class SetupFragment extends Fragment {
                 return inflater.inflate(fragmentId, container, false);
             }
         } else {
-            Log.e(TAG, "could not get mainActivity, can't create fragment");
+            Log.d(TAG, "could not get mainActivity, can't create fragment");
             return null;
         }
     }

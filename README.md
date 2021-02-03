@@ -253,9 +253,9 @@ public void saveLocationsToFile(String filesDirectoryPath, String locationsFileN
         oos.writeObject(points);
         Log.d(TAG, "backupLocations: Done");
     } catch (FileNotFoundException e) {
-        Log.e(TAG, e.getMessage(), e);
+        Log.d(TAG, e.getMessage(), e);
     } catch (IOException e) {
-        Log.e(TAG, e.getMessage(), e);
+        Log.d(TAG, e.getMessage(), e);
     } finally {
         try {
             if (oos != null) {
@@ -265,7 +265,7 @@ public void saveLocationsToFile(String filesDirectoryPath, String locationsFileN
                 fos.close();
             }
         } catch (IOException e) {
-            Log.e(TAG, e.getMessage(), e);
+            Log.d(TAG, e.getMessage(), e);
         }
     }
 }
@@ -310,7 +310,7 @@ localize.addOnStatusChangedListener(localizationStatus -> {
                     if (future.isSuccess()) {
                         Log.d(TAG, "Map frame reached successfully");
                     } else if (future.hasError()) {
-                        Log.e(TAG, "Error while going to map frame", future.getError());
+                        Log.d(TAG, "Error while going to map frame", future.getError());
                     }
                 });
     }
@@ -389,7 +389,7 @@ void goToLocation(final String location) {
         if (future.isSuccess()) {
             Log.i(TAG, "Location reached: " + location);
         } else if (future.hasError()) {
-            Log.e(TAG, "Go to location error", future.getError());
+            Log.d(TAG, "Go to location error", future.getError());
         }
     });
 }

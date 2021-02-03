@@ -80,7 +80,7 @@ Push Pepper slowly along the desired navigation path (route) that it will have t
 
 **When mapping, it is necessary to go along the desired path in both directions to enable the robot to take pictures of its environment in both ways. Then, when it will navigate, it will be able to localize itself in both directions.** (we will see some exceptions later).
 
-If you know some places are key positions where the robot may need to relocalize or interact with People, then stop and make a 360° turn, with a pause every 45°, so the robot can take pictures all around (25 cm in front of the Charging Station for example).
+If you know some places are key positions where the robot may need to relocalize or interact with People or at the cross of multiple paths, then stop and make a 360° turn, with a pause every 45° by clicking the **Full Turn** button, so the robot can take pictures all around (25 cm in front of the Charging Station for example).
 
 **Example of mapping for multiple kinds of Paths**
 
@@ -95,7 +95,7 @@ If Pepper is going to perform a part of its path always in the same direction, i
 
 (The representation of this map is shown below).
 
-When you are done with the mapping in both directions, you should logically be back to where you started, the MapFrame. Try to come back exactly at the starting position (MapFrame) then do a 360° turn, with a pause every 45°: it helps to improve the consistency of the map.
+When you are done with the mapping in both directions, you should logically be back to where you started, the MapFrame. Try to come back exactly at the starting position (MapFrame) then do a 360° turn, with a pause every 45°  by clicking the **Full Turn** button : it helps to improve the consistency of the map.
 Then click on the TODO check button named "Save/stop mapping".
 
 Once the **Map** of the environment is saved, you will see a representation of the map on the screen. It is a representation only, because, as said earlier, Pepper uses pictures to localize itself and this representation is not made with the information from the lasers.
