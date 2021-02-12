@@ -155,7 +155,7 @@ public class GoToHelper {
                 Frame chargingStationFrame;
                 chargingStationFrame = mapping.chargingStationFrame();
                 Vector3 stationPositionInMemorynWrtRobot = chargingStationFrame.computeTransform(robotFrame).getTransform().getTranslation();
-                Log.d(TAG, "abs:stationPositioInMemorynWrtRobot.x:" + Math.abs(stationPositionInMemorynWrtRobot.getX()) + " , abs:stationPositioInMemorynWrtRobot.y : " + Math.abs(stationPositionInMemorynWrtRobot.getY())); // should be [0,0] if pepper is docked!
+                Log.d(TAG, "abs:stationPositioInMemorynWrtRobot.x : " + Math.abs(stationPositionInMemorynWrtRobot.getX()) + " , abs:stationPositioInMemorynWrtRobot.y : " + Math.abs(stationPositionInMemorynWrtRobot.getY())); // should be [0,0] if pepper is docked!
                 if (stationPositionInMemorynWrtRobot.getX() == 0.0 && stationPositionInMemorynWrtRobot.getY() == 0.0) {
                     Log.d(TAG, "isDocked ? : Already docked");
                     return Future.of(true);

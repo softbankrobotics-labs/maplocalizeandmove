@@ -79,6 +79,7 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
     public boolean goToStraight = false;
     public List<String> locationsToGoTo = null;
     public AtomicBoolean robotIsLocalized = new AtomicBoolean(false);
+    public boolean robotLocalizedOnce = false;
     private final AtomicBoolean load_location_success = new AtomicBoolean(false);
     public boolean withExistingMap = false;
     private Future<Void> goToRandomFuture;
@@ -486,7 +487,9 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
                         if (withExistingMap) {
                             robotHelper.localizeAndMapHelper.addOnFinishedLocalizingListener(result -> {
                                 if (result == LocalizeAndMapHelper.LocalizationStatus.LOCALIZED) {
-                                    robotHelper.localizeAndMapHelper.animationToLookInFront();
+                                    robotHelper.localizeAndMapHelper.animationToLookInFront().thenConsume(value -> {
+                                        runOnUiThread(() -> localizeAndMapFragment.onIntialMappingFinished(0));
+                                    });
                                     Log.d(TAG, "startMapping: withExistingMap, localized, animationToLookInFront()");
                                 }
                             });
@@ -544,7 +547,7 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
                             robotHelper.localizeAndMapHelper.removeOnFinishedLocalizingListeners();
                         });
                         robotHelper.localizeAndMapHelper.localizeAndMap(withExistingMap);
-                        runOnUiThread(() -> localizeAndMapFragment.onIntialMappingFinished());
+                        if (!withExistingMap) runOnUiThread(() -> localizeAndMapFragment.onIntialMappingFinished(24000));
                     }));
         }));
     }

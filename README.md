@@ -5,7 +5,14 @@ Navigation tutorial for Pepper running on Android.
 
 The **User Guide** of this application is available [here](User_Guide-Best_Practices_for_Navigation.md).
 
-This version is compatible with Pepper running Naoqi OS 2.9.5.172 and more.
+This version is compatible with Pepper running **Naoqi OS 2.9.5.172** and more.
+
+**It is strongly recommended to use a Pepper 1.8 hardware version to perform navigation**.
+
+Required configuration:
+* **Software**: NAOqi version 2.9.5.172 (Market Release) 
+* **Hardware**: **Pepper 1.8** hardware version (four wholes above the neck). Even if most of the code will work on **Pepper 1.8a**, the performances are not good enough for a **Production Environment**.
+* **Charging Station**: If you have a **Charging Station**, it is required to install the application **Autonomous Recharge** on your robot to use it. It is available on [Command Center Store](https://command-center.softbankrobotics.com/store/).
 
 **Note** : A lot of debug logs are published by this application on purpose, to help you understand the **steps** and **status**.
 
@@ -27,7 +34,7 @@ As of API level 7, there is no possibility to provide a blueprint of your premis
 
 The MapFrame is where you plan to start the app everyday. This position will be learnt very precisely by Pepper and will represent the "zero", the origin of your map. The robot will be able to relocate very precisely at this position, hence getting a good initial position to start navigating in the morning! 
 
-Make sure the charging Flap is *closed*, make sure there is no one around the robot (they would be recognized as permanent obstacles) for at least 15s. Then start [LocalizeAndMap](https://developer.softbankrobotics.com/pepper-qisdk/api/motion/reference/localizeandmap). This will make the robot look around, effectively taking 360° pictures that will be used to recognize its location and orientation later on.
+Make sure the charging Flap is **closed**, make sure there is no one around the robot (they would be recognized as permanent obstacles) for at least 15s. Then start [LocalizeAndMap](https://developer.softbankrobotics.com/pepper-qisdk/api/motion/reference/localizeandmap). This will make the robot look around, effectively taking 360° pictures that will be used to recognize its location and orientation later on.
 <pre><code class="java">
 // Build the action.
 LocalizeAndMap localizeAndMap = LocalizeAndMapBuilder.with(qiContext).build();
@@ -38,16 +45,16 @@ Future<Void> localizingAndMapping = localizeAndMap.async().run();
 
 ##### 1.2) Show the robot around
 
-Once the mapping of the origin of the map (MapFrame) is finished, open the **Charging Flap**. Place yourself *behind* the robot and slowly push it around the premises. 
+Once the mapping of the origin of the map (MapFrame) is finished, open the **Charging Flap**. Place yourself **behind** the robot and slowly push it around the premises. 
 
 ###### 1.8a robots
-During this step, the robot uses its cameras, odometry and its laser sensors to map its close environment. If you don't stay behind the robot(don't walk on the side of Pepper), it will see you as an obstacle and block this way in the final map. Also ideally hold the tracking so the head stays in the front of the robot, and move slowly so Pepper has the time to record more information from the lasers. For better result, try not to make loops but rather straight paths or radial movements.
+During this step, the robot uses its cameras, odometry and its laser sensors to map its close environment. If you don't stay behind the robot(don't walk on the side of Pepper), it will see you as an obstacle and block this way in the final map. Move slowly so Pepper has the time to record more information from the lasers. For better result, try not to make loops but rather straight paths or radial movements.
 During this step, the robot will also learn the paths to navigate through the map. Pepper will always prefer the path you used during this mapping phase when moving. 
 Last, if you know some places are key positions where the robot may need to relocalize, then stop and make a 360° at that place, so the robot takes pictures all around and not only in front.
 
 ###### 1.8 robots (better performances)
 During this step, the robot uses its stereo cameras. They work as two smartphones cameras but in grayscale (no color). It does Visual SLAM, constant relocalization with image comparison and odometry to map its environment.
-A visual landmark detection is performed, we try to match contrasted corners. Pictures are not saved, only mathematical data associated to it.
+A visual landmark detection is performed, we try to match contrasted corners. So ideally hold the tracking so the head stays in the front of the robot. Pictures are not saved, only mathematical data associated to it.
 
 1. Try to maximize the amount of texture in the environment:
 * Good :  posters, paintings, plants, random stuff
@@ -65,9 +72,9 @@ A visual landmark detection is performed, we try to match contrasted corners. Pi
 
 5. Try to come back exactly at the starting position(MapFrame) then do a 360° turn, stopping every 30°, before finishing (requestCancellation()) the LocalizeAndMap. It helps improving the consistency of the map.
 
-*It is now possible to make loops in your app.*  And this is even Better.
+**It is now possible to make loops in your app.** And this is even Better (Pepper 1.8 hardware version).
 
-Also ideally hold the tracking so the head stays in the front of the robot, and move slowly so the pictures are of good quality and Pepper can record more of them. *It is now possible to make loops in your app.*  And this is even Better.
+Also ideally hold the tracking so the head stays in the front of the robot, and move slowly so the pictures are of good quality and Pepper can record more of them.
 
 **When doing the map, it is necessary to go along the robot path in both directions to able the robot to take pictures of its environnement in both directions. Then, when it will navigate, it will be able to localize itself in both directions.
 Always go back to the MapFrame when you are done mapping before stopping the LocalizeAndMap action and saving the map.**
@@ -420,7 +427,7 @@ The application Autonomous Recharge is now available on [Command Center](https:/
 A library is available on [GitHub](https://github.com/aldebaran/qisdk-sample-autonomous-recharge-advanced-integration) to ease the use of Autonomous Recharge from your own application.
 
 The [README](https://github.com/aldebaran/qisdk-sample-autonomous-recharge-advanced-integration/blob/master/README.md) explains how to use it and how it works.
-If you are using Navigation along the use of Autonomous Recharge, you have to make Pepper move in front of the Charging Station and set recallPod to *false* before starting the docking with :
+If you are using Navigation along the use of Autonomous Recharge, you have to make Pepper move in front of the Charging Station and set recallPod to **false** before starting the docking with :
 <pre>
 AutonomousRecharge.startDockingActivity(this, recallPod)
 </pre>

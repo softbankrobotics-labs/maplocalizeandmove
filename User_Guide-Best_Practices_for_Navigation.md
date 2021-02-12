@@ -1,12 +1,15 @@
 # MapLocalizeAndMove User Guide - Best Practices for Navigation 
 
-This article will present how to use the application *MapLocalize&Move*, and the best practices for Mapping an area.
+This article will present how to use the application **MapLocalize&Move**, and the best practices for Mapping an area.
 
 This version is compatible with Pepper running Naoqi OS 2.9.5.172 and more.
 
+**It is strongly recommended to use a Pepper 1.8 hardware version to perform navigation**.
+**This tutorial has been written for Pepper 1.8 hardware version only.**
+
 Required configuration:
 * **Software**: NAOqi version 2.9.5.172 (Market Release) 
-* **Hardware**: Pepper 1.8 hardware version (four wholes above the neck). Even if most of the code will work on Pepper 1.8a, the performances are not good enough for a **Production Environment**.
+* **Hardware**: **Pepper 1.8** hardware version (four wholes above the neck). Even if most of the code will work on **Pepper 1.8a**, the performances are not good enough for a **Production Environment**.
 * **Charging Station**: If you have a **Charging Station**, it is required to install the application **Autonomous Recharge** on your robot to use it. It is available on [Command Center Store](https://command-center.softbankrobotics.com/store/).
 
 Please make sure that Pepper's volume is not set to zero, as Pepper is giving some instructions by *voice*.
@@ -96,7 +99,7 @@ If Pepper is going to perform a part of its path always in the same direction, i
 (The representation of this map is shown below).
 
 When you are done with the mapping in both directions, you should logically be back to where you started, the MapFrame. Try to come back exactly at the starting position (MapFrame) then do a 360° turn, with a pause every 45°  by clicking the **Full Turn** button : it helps to improve the consistency of the map.
-Then click on the TODO check button named "Save/stop mapping".
+Then click on the button named "Save/stop mapping".
 
 Once the **Map** of the environment is saved, you will see a representation of the map on the screen. It is a representation only, because, as said earlier, Pepper uses pictures to localize itself and this representation is not made with the information from the lasers.
 
@@ -111,7 +114,7 @@ The PoI that you will save during this step enables Pepper to move from one to a
 <img src="screen_shots/screen3.png"  height="450">
 
 Still in Setup Mode, click **Save Locations**, then **Add Locations**. Move Pepper to MapFrame, and then click **You are Home** (don't forget to step away from Pepper). Pepper will localize itself.
-Once it's done, Pepper will offer you to save the Position of the Charging Station. If you have one, open the Charging Flap and move Pepper in front of it (where you previously did a 360° turn during **Mapping**), then do a 180* turn (stay behind it) and move Pepper on its Station, then click **Save**. If you don't have a Charging Station, you can press **Skip**.
+Once it's done, Pepper will offer you to save the Position of the Charging Station. If you have one, open the Charging Flap and move Pepper in front of it (where you previously did a 360° turn during **Mapping**), then do a 180° turn (stay behind it) and move Pepper on its Station, then click **Save**. If you don't have a Charging Station, you can press **Skip**.
 
 If not done yet, open the Charging Flap and move Pepper to the PoI/Location that you want Pepper to save. When pushing Pepper, make sure to be on the path you saved during the *Mapping* step, and give Pepper the same orientation it had.
 When you reach the point you want to save, give Pepper the desired orientation then click **Save Location**. You can save as many PoI as you want.
@@ -129,7 +132,7 @@ Now that all the data are saved in memory, they will be reloaded automatically t
 
 First of all, Pepper needs to know where it is. Move it to the **MapFrame**, then click **Production Mode** then **Localize my Robot**.
 
-If Pepper fails to Localize, make sure that you are exactly on the MapFrame, then click *Retry* 
+If Pepper fails to Localize, make sure that you are exactly on the MapFrame, then click **Retry** 
 
 If Pepper succeeds to Localize, the **GoTo Frame** screen will be displayed (a **Frame** is a **PoI**).
 

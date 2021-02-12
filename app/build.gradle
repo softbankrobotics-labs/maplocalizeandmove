@@ -7,8 +7,8 @@ android {
         applicationId "com.softbankrobotics.maplocalizeandmove"
         minSdkVersion 23
         targetSdkVersion 30
-        versionCode 146
-        versionName "1.4.6"
+        versionCode 147
+        versionName "1.4.7"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         setProperty("archivesBaseName", "maplocalizeandmove-$versionName")
     }

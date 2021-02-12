@@ -201,6 +201,7 @@ public class SaveLocationsFragment extends Fragment {
                     ma.robotIsLocalized.set(result == LocalizeAndMapHelper.LocalizationStatus.LOCALIZED);
                     ma.runOnUiThread(() -> {
                         if (result == LocalizeAndMapHelper.LocalizationStatus.LOCALIZED) {
+                            ma.robotLocalizedOnce = true;
                             display3rdStepChargingStation();
                             ma.robotHelper.localizeAndMapHelper.removeOnFinishedLocalizingListeners();
                         } else if (result == LocalizeAndMapHelper.LocalizationStatus.MAP_MISSING) {

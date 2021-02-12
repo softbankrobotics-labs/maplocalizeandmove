@@ -81,6 +81,7 @@ public class LocalizeRobotFragment extends Fragment {
             ma.robotHelper.releaseAbilities();
             ma.runOnUiThread(() -> {
                 if (result == LocalizeAndMapHelper.LocalizationStatus.LOCALIZED) {
+                    ma.robotLocalizedOnce = true;
                     localizedPopup.dialog.show();
                     localizedPopup.dialog.getWindow().setAttributes(localizedPopup.lp);
                     FutureUtils.wait(4, TimeUnit.SECONDS)

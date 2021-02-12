@@ -79,6 +79,8 @@ public class LocalizeAndMapFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         localView = view;
         mapping_error = localView.findViewById(R.id.mapping_error);
+        icn_360_load = localView.findViewById(R.id.icn_360_load);
+
         localView.findViewById(R.id.back_button).setOnClickListener((v) -> {
             if (timer != null) timer.cancel();
             ma.robotHelper.releaseAbilities();
@@ -98,10 +100,12 @@ public class LocalizeAndMapFragment extends Fragment {
 
         button_full_turn = localView.findViewById(R.id.button_full_turn);
         button_full_turn.setOnClickListener((v) -> {
-            button_full_turn.setEnabled(false);
-            ma.robotHelper.say("Please stay away from me during full turn");
-            animationFuture = ma.robotHelper.localizeAndMapHelper.animationToLookAround();
-            animationFuture.thenConsume(value -> ma.runOnUiThread(()->button_full_turn.setEnabled(true)));
+            if (!ma.robotHelper.askToCloseIfFlapIsOpened()) {
+                button_full_turn.setEnabled(false);
+                ma.robotHelper.say("Please stay away from me during full turn");
+                animationFuture = ma.robotHelper.localizeAndMapHelper.animationToLookAround();
+                animationFuture.thenConsume(value -> ma.runOnUiThread(()->button_full_turn.setEnabled(true)));
+            }
         });
 
         retry = localView.findViewById(R.id.button_retry);
@@ -125,6 +129,7 @@ public class LocalizeAndMapFragment extends Fragment {
         displayExistingMap = existingOrNewMapPopup.inflator.findViewById(R.id.display_map);
         extend_map = existingOrNewMapPopup.inflator.findViewById(R.id.extend_map);
         progressBar = existingOrNewMapPopup.inflator.findViewById(R.id.progressbar);
+
         extend_map.setOnClickListener((v) -> {
             existingOrNewMapPopup.dialog.hide();
             ma.startMapping(true);
@@ -153,7 +158,7 @@ public class LocalizeAndMapFragment extends Fragment {
                     ma.runOnUiThread(() -> {
                         displayExistingMap.setImageBitmap(explorationMapBitmap);
                         progressBar.setVisibility(View.GONE);
-                        extend_map.setClickable(true);
+                        extend_map.setEnabled(true);
                     });
                 });
             }
@@ -181,8 +186,7 @@ public class LocalizeAndMapFragment extends Fragment {
     /**
      * Start the slideshow with the instructions on how to map with Pepper.
      */
-    public void onIntialMappingFinished() {
-        icn_360_load = localView.findViewById(R.id.icn_360_load);
+    public void onIntialMappingFinished(long delay) {
         ImageView ic_360_map = localView.findViewById(R.id.ic_360_map);
         ImageView warning = localView.findViewById(R.id.warning);
         TextView warning_text = localView.findViewById(R.id.warning_text);
@@ -252,6 +256,6 @@ public class LocalizeAndMapFragment extends Fragment {
                     }
                 });
             }
-        }, 24000, 10000);
+        }, delay, 10000);
     }
 }

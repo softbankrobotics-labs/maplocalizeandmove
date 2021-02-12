@@ -72,7 +72,7 @@ public class ProductionFragment extends Fragment {
 
         Button undock = view.findViewById(R.id.goto_undock);
         undock.setOnClickListener(v -> {
-            if (ma.savedLocations.containsKey("ChargingStation")) {
+            if (ma.robotLocalizedOnce && ma.savedLocations.containsKey("ChargingStation")) {
                 if (ma.robotHelper.goToHelper.isDocked(ma.savedLocations.get("ChargingStation")).getValue()) {
                     ma.undockFromChargingStation();
                 } else {
